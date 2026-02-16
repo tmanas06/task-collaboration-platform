@@ -1,0 +1,92 @@
+export interface User {
+    id: string;
+    email: string;
+    name: string;
+    avatar?: string | null;
+    createdAt: string;
+}
+
+export interface BoardMember {
+    id: string;
+    boardId: string;
+    userId: string;
+    role: 'ADMIN' | 'MEMBER';
+    joinedAt: string;
+    user: User;
+}
+
+export interface TaskAssignee {
+    id: string;
+    taskId: string;
+    userId: string;
+    assignedAt: string;
+    user: User;
+}
+
+export interface Task {
+    id: string;
+    title: string;
+    description?: string | null;
+    position: number;
+    listId: string;
+    dueDate?: string | null;
+    createdAt: string;
+    updatedAt: string;
+    assignees: TaskAssignee[];
+}
+
+export interface List {
+    id: string;
+    title: string;
+    position: number;
+    boardId: string;
+    createdAt: string;
+    updatedAt: string;
+    tasks: Task[];
+}
+
+export interface Board {
+    id: string;
+    title: string;
+    description?: string | null;
+    createdById: string;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: User;
+    members: BoardMember[];
+    lists: List[];
+    _count?: { lists: number };
+}
+
+export interface Activity {
+    id: string;
+    action: string;
+    entityType: string;
+    entityId: string;
+    metadata?: Record<string, any>;
+    userId: string;
+    boardId: string;
+    createdAt: string;
+    user: User;
+}
+
+export interface Pagination {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    pagination: Pagination;
+}
+
+export interface AuthResponse {
+    user: User;
+    token: string;
+}
+
+export interface ApiResponse<T> {
+    data: T;
+}
