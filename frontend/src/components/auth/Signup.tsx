@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { Layout } from 'lucide-react';
 
 export default function Signup() {
     const [name, setName] = useState('');
@@ -20,60 +21,58 @@ export default function Signup() {
     };
 
     return (
-        <div className="min-h-screen bg-dark-950 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-background flex items-center justify-center px-4 transition-colors duration-300">
             <div className="w-full max-w-md animate-fade-in">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-primary-500/20">
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
+                    <div className="w-14 h-14 bg-accent-color rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-accent-color/20">
+                        <Layout className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-3xl font-bold text-white">Create account</h1>
-                    <p className="text-dark-400 mt-2">Get started with TaskFlow today</p>
+                    <h1 className="text-3xl font-bold text-foreground">Create account</h1>
+                    <p className="text-muted-foreground mt-2">Get started with TaskFlow today</p>
                 </div>
 
                 {/* Form */}
-                <div className="bg-dark-900 border border-dark-700 rounded-2xl p-8 shadow-2xl">
+                <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl transition-colors">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {error && (
-                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm animate-slide-down">
+                            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-500 px-4 py-3 rounded-xl text-sm animate-slide-down">
                                 {error}
-                                <button onClick={clearError} className="float-right text-red-400/60 hover:text-red-400">✕</button>
+                                <button onClick={clearError} className="float-right text-rose-500/60 hover:text-rose-500">✕</button>
                             </div>
                         )}
 
                         <div>
-                            <label className="block text-sm font-medium text-dark-300 mb-1.5">Full Name</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1.5">Full Name</label>
                             <input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-accent-color focus:border-transparent outline-none transition-all"
                                 placeholder="John Doe"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-dark-300 mb-1.5">Email</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1.5">Email Address</label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-accent-color focus:border-transparent outline-none transition-all"
                                 placeholder="you@example.com"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-dark-300 mb-1.5">Password</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1.5">Password</label>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-accent-color focus:border-transparent outline-none transition-all"
                                 placeholder="At least 6 characters"
                                 minLength={6}
                                 required
@@ -83,7 +82,7 @@ export default function Signup() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white font-semibold rounded-xl hover:from-primary-500 hover:to-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40"
+                            className="w-full py-3 bg-accent-color text-white font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-accent-color/25"
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
@@ -96,9 +95,9 @@ export default function Signup() {
                         </button>
                     </form>
 
-                    <p className="mt-6 text-center text-sm text-dark-400">
+                    <p className="mt-6 text-center text-sm text-muted-foreground">
                         Already have an account?{' '}
-                        <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
+                        <Link to="/login" className="text-accent-color hover:opacity-80 font-medium transition-colors">
                             Sign in
                         </Link>
                     </p>

@@ -36,7 +36,7 @@ export default function CreateTaskButton({ listId }: Props) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     onClick={() => setIsOpen(true)}
-                    className="w-full py-3 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-indigo-400 hover:bg-indigo-500/5 rounded-xl transition-all flex items-center justify-center gap-2 group"
+                    className="w-full py-3 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-accent-color hover:bg-accent-color/5 rounded-xl transition-all flex items-center justify-center gap-2 group"
                 >
                     <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     Add Task
@@ -53,7 +53,7 @@ export default function CreateTaskButton({ listId }: Props) {
                         <textarea
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full px-4 py-3 bg-zinc-950 border border-white/10 rounded-xl text-sm font-bold text-white placeholder-zinc-700 focus:border-indigo-500/50 outline-none resize-none shadow-inner"
+                            className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-sm font-bold text-foreground placeholder-muted-foreground focus:border-accent-color/50 outline-none resize-none shadow-inner transition-colors"
                             rows={3}
                             placeholder="Enter task title..."
                             autoFocus
@@ -66,22 +66,22 @@ export default function CreateTaskButton({ listId }: Props) {
                             }}
                         />
                         <div className="absolute bottom-3 right-3 flex items-center gap-1 opacity-20">
-                            <span className="text-[10px] font-bold text-zinc-500">Return</span>
-                            <CornerDownLeft className="w-3 h-3 text-zinc-500" />
+                            <span className="text-[10px] font-bold text-muted-foreground">Return</span>
+                            <CornerDownLeft className="w-3 h-3 text-muted-foreground" />
                         </div>
                     </div>
                     <div className="flex gap-2">
                         <button
                             type="submit"
                             disabled={isLoading || !title.trim()}
-                            className="flex-1 py-2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-all shadow-lg shadow-indigo-500/20"
+                            className="flex-1 py-2 bg-accent-color text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-accent-color/20"
                         >
                             {isLoading ? '...' : 'Add Task'}
                         </button>
                         <button
                             type="button"
                             onClick={() => { setIsOpen(false); setTitle(''); }}
-                            className="p-2 text-zinc-500 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+                            className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/10 transition-colors"
                         >
                             <X className="w-4 h-4" />
                         </button>

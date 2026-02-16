@@ -6,56 +6,106 @@
 
 @layer base {
   :root {
+    --background: 0 0% 98%;
+    --foreground: 240 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 5% 90%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 10% 85%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 1rem;
+
+    /* Accent Colors - HSL values */
+    --accent-indigo: 239 84% 67%;
+    --accent-emerald: 160 84% 39%;
+    --accent-rose: 346 84% 61%;
+    --accent-amber: 38 92% 50%;
+    --accent-cyan: 188 86% 53%;
+    --accent-violet: 262 83% 58%;
+
+    /* Current Selected Accent */
+    --color-primary: var(--accent-indigo);
+  }
+
+  .dark {
     --background: 240 10% 2%;
-    /* Deep dark */
     --foreground: 0 0% 98%;
     --card: 240 10% 4%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 263.4 70% 50.4%;
-    --radius: 1rem;
+    --ring: 240 4.9% 83.9%;
   }
 }
 
 @layer base {
   * {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: hsl(var(--border) / 0.1);
   }
 
   body {
-    @apply bg-[#030303] text-zinc-100 font-sans antialiased overflow-x-hidden selection:bg-indigo-500/30;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    @apply font-sans antialiased overflow-x-hidden transition-colors duration-300;
     font-family: 'Inter', sans-serif;
+  }
+
+  .dark body {
+    background-color: #030303;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-zinc-900/40 backdrop-blur-xl border border-white/10 shadow-2xl;
+    background-color: hsl(var(--card) / 0.4);
+    @apply backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+
+  .dark .glass-card {
+    @apply bg-zinc-900/40;
   }
 
   .glass-panel {
-    @apply bg-black/40 backdrop-blur-lg border border-white/5;
+    background-color: hsl(var(--background) / 0.4);
+    @apply backdrop-blur-lg border border-white/5;
   }
 
   .trello-column {
-    @apply w-[320px] shrink-0 h-full flex flex-col bg-zinc-900/30 backdrop-blur-md rounded-2xl border border-white/5 hover:bg-zinc-900/40 transition-colors duration-300;
+    background-color: hsl(var(--muted) / 0.3);
+    @apply w-[320px] shrink-0 h-full flex flex-col backdrop-blur-md rounded-2xl border border-white/5 hover:bg-muted/40 transition-colors duration-300;
   }
 
   .notion-card {
-    @apply relative bg-zinc-900/50 backdrop-blur-sm border border-white/5 rounded-xl p-4 transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-900/80 hover:border-indigo-500/30 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/5;
+    background-color: hsl(var(--card) / 0.5);
+    @apply relative backdrop-blur-sm border border-white/5 rounded-xl p-4 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-2xl;
+  }
+
+  .dark .notion-card {
+    @apply bg-zinc-900/50 hover:bg-zinc-900/80;
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -68,14 +118,19 @@
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-white to-zinc-500;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(to bottom right, hsl(var(--foreground)), hsl(var(--foreground) / 0.5));
   }
 }
 
-.parallax-container {
-  perspective: 1000px;
+.bg-accent-color {
+  background-color: hsl(var(--color-primary));
 }
 
-.perspective-1000 {
-  perspective: 1000px;
+.text-accent-color {
+  color: hsl(var(--color-primary));
+}
+
+.border-accent-color {
+  border-color: hsl(var(--color-primary) / 0.5);
 }

@@ -67,12 +67,12 @@ export default function BoardPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-[#030303]">
+            <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
                 <Navbar />
                 <div className="flex items-center justify-center h-[calc(100vh-64px)]">
                     <div className="relative">
-                        <div className="w-12 h-12 border-4 border-white/5 border-t-indigo-500 rounded-full animate-spin" />
-                        <div className="absolute inset-0 blur-xl bg-indigo-500/20 animate-pulse" />
+                        <div className="w-12 h-12 border-4 border-border border-t-accent-color rounded-full animate-spin" />
+                        <div className="absolute inset-0 blur-xl bg-accent-color/20 animate-pulse" />
                     </div>
                 </div>
             </div>
@@ -81,16 +81,16 @@ export default function BoardPage() {
 
     if (error || !currentBoard) {
         return (
-            <div className="min-h-screen bg-[#030303]">
+            <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
                 <Navbar />
-                <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-6 p-6">
+                <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-6 p-6 text-center">
                     <div className="w-20 h-20 bg-rose-500/10 rounded-3xl flex items-center justify-center border border-rose-500/20">
                         <span className="text-4xl text-rose-500 font-bold">!</span>
                     </div>
-                    <p className="text-xl font-bold text-white">{error || 'Project not found'}</p>
+                    <p className="text-xl font-bold text-foreground">{error || 'Project not found'}</p>
                     <button
                         onClick={() => navigate('/')}
-                        className="px-8 py-3 bg-zinc-900 border border-white/10 text-white font-bold rounded-2xl hover:bg-zinc-800 transition-all"
+                        className="px-8 py-3 bg-muted/20 border border-border text-foreground font-bold rounded-2xl hover:bg-muted/30 transition-all"
                     >
                         Back to Workspace
                     </button>
@@ -100,12 +100,12 @@ export default function BoardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#030303] flex flex-col relative overflow-hidden">
+        <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden transition-colors duration-300">
             {/* Parallax Background Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-purple-600/5 blur-[100px] rounded-full delay-1000 animate-pulse" />
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-50" />
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent-color/10 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-accent-color/5 blur-[100px] rounded-full delay-1000 animate-pulse" />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] dark:opacity-20 brightness-100 dark:brightness-50 mix-blend-overlay" />
             </div>
 
             <Navbar />

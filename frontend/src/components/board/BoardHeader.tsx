@@ -88,13 +88,13 @@ export default function BoardHeader({ board, currentUser }: Props) {
     };
 
     return (
-        <div className="bg-black/20 px-8 py-6 backdrop-blur-md border-b border-white/5 relative z-20">
+        <div className="bg-muted/10 px-8 py-6 backdrop-blur-md border-b border-border relative z-20 transition-colors">
             <div className="max-w-[1800px] mx-auto flex items-center justify-between flex-wrap gap-6">
                 {/* Title Section */}
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center shadow-inner">
-                            <Hash className="w-6 h-6 text-indigo-400" />
+                        <div className="w-12 h-12 bg-muted/20 border border-border rounded-2xl flex items-center justify-center shadow-inner">
+                            <Hash className="w-6 h-6 text-accent-color" />
                         </div>
                         <div className="flex flex-col">
                             <AnimatePresence mode="wait">
@@ -110,13 +110,13 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                             value={title}
                                             onChange={(e) => setTitle(e.target.value)}
                                             onKeyDown={(e) => e.key === 'Enter' && handleTitleSave()}
-                                            className="text-2xl font-black bg-zinc-900 border border-indigo-500/50 rounded-xl px-3 py-1 text-white outline-none ring-4 ring-indigo-500/10"
+                                            className="text-2xl font-black bg-background border border-accent-color/50 rounded-xl px-3 py-1 text-foreground outline-none ring-4 ring-accent-color/10"
                                             autoFocus
                                         />
-                                        <button onClick={handleTitleSave} className="p-2 bg-indigo-600 rounded-lg text-white">
+                                        <button onClick={handleTitleSave} className="p-2 bg-accent-color rounded-lg text-white">
                                             <Check className="w-4 h-4" />
                                         </button>
-                                        <button onClick={() => setIsEditing(false)} className="p-2 bg-zinc-800 rounded-lg text-zinc-400">
+                                        <button onClick={() => setIsEditing(false)} className="p-2 bg-muted/30 rounded-lg text-muted-foreground">
                                             <X className="w-4 h-4" />
                                         </button>
                                     </motion.div>
@@ -124,14 +124,14 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                     <motion.h1
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className={`text-3xl font-black tracking-tight text-white ${isAdmin ? 'cursor-pointer hover:text-indigo-400 transition-colors' : ''}`}
+                                        className={`text-3xl font-black tracking-tight text-foreground ${isAdmin ? 'cursor-pointer hover:text-accent-color transition-colors' : ''}`}
                                         onClick={() => isAdmin && setIsEditing(true)}
                                     >
                                         {board.title}
                                     </motion.h1>
                                 )}
                             </AnimatePresence>
-                            <p className="text-sm text-zinc-500 font-medium">
+                            <p className="text-sm text-muted-foreground font-medium">
                                 {board.description || 'No description provided'}
                             </p>
                         </div>
@@ -145,25 +145,25 @@ export default function BoardHeader({ board, currentUser }: Props) {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setShowMembers(!showMembers)}
-                            className="flex items-center gap-3 px-4 py-2.5 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group"
+                            className="flex items-center gap-3 px-4 py-2.5 bg-muted/10 border border-border rounded-2xl hover:bg-muted/20 transition-all group"
                         >
                             <div className="flex -space-x-3">
                                 {board.members.slice(0, 3).map((m) => (
                                     <div
                                         key={m.id}
-                                        className="w-8 h-8 rounded-full bg-zinc-800 border-2 border-[#0a0a0a] flex items-center justify-center text-[10px] font-black text-white group-hover:border-indigo-500/30 transition-colors"
+                                        className="w-8 h-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-[10px] font-black text-foreground group-hover:border-accent-color/30 transition-colors"
                                     >
                                         {m.user.name.charAt(0).toUpperCase()}
                                     </div>
                                 ))}
                                 {board.members.length > 3 && (
-                                    <div className="w-8 h-8 rounded-full bg-zinc-900 border-2 border-[#0a0a0a] flex items-center justify-center text-[10px] font-bold text-zinc-400">
+                                    <div className="w-8 h-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">
                                         +{board.members.length - 3}
                                     </div>
                                 )}
                             </div>
-                            <span className="text-sm font-bold text-zinc-300">Share</span>
-                            <ChevronDown className={`w-4 h-4 text-zinc-600 transition-transform ${showMembers ? 'rotate-180' : ''}`} />
+                            <span className="text-sm font-bold text-foreground/80">Share</span>
+                            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showMembers ? 'rotate-180' : ''}`} />
                         </motion.button>
 
                         <AnimatePresence>
@@ -172,15 +172,15 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                     initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                    className="absolute right-0 mt-4 w-96 glass-card rounded-3xl shadow-2xl z-50 overflow-hidden bg-zinc-950 border border-white/10"
+                                    className="absolute right-0 mt-4 w-96 bg-card border border-border rounded-3xl shadow-2xl z-50 overflow-hidden transition-colors"
                                 >
                                     <div className="p-6">
                                         <div className="flex items-center justify-between mb-6">
                                             <div className="flex items-center gap-2">
-                                                <Users className="w-4 h-4 text-indigo-400" />
-                                                <h3 className="text-sm font-bold text-white uppercase tracking-widest">Board Access</h3>
+                                                <Users className="w-4 h-4 text-accent-color" />
+                                                <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Board Access</h3>
                                             </div>
-                                            <span className="px-2 py-0.5 rounded-lg bg-white/5 text-[10px] font-black text-zinc-400 uppercase tracking-tighter">
+                                            <span className="px-2 py-0.5 rounded-lg bg-muted/20 text-[10px] font-black text-muted-foreground uppercase tracking-tighter">
                                                 {board.members.length} Members
                                             </span>
                                         </div>
@@ -188,16 +188,16 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                         {isAdmin && (
                                             <div className="mb-6">
                                                 <div className="relative group">
-                                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 group-focus-within:text-white transition-colors" />
+                                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
                                                     <input
                                                         type="text"
                                                         value={memberEmail}
                                                         onChange={(e) => setMemberEmail(e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/5 rounded-2xl text-sm text-white placeholder-zinc-700 outline-none focus:bg-white/10 focus:border-indigo-500/50 transition-all"
+                                                        className="w-full pl-11 pr-4 py-3 bg-muted/20 border border-border rounded-2xl text-sm text-foreground placeholder-muted-foreground outline-none focus:bg-muted/30 focus:border-accent-color transition-all"
                                                         placeholder="Search users by name or email..."
                                                     />
                                                     {isSearching && (
-                                                        <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-500 animate-spin" />
+                                                        <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-accent-color animate-spin" />
                                                     )}
                                                 </div>
 
@@ -206,31 +206,31 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                                         <motion.div
                                                             initial={{ opacity: 0, y: -10 }}
                                                             animate={{ opacity: 1, y: 0 }}
-                                                            className="mt-2 p-2 bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-2xl max-h-48 overflow-y-auto no-scrollbar"
+                                                            className="mt-2 p-2 bg-card border border-border rounded-2xl max-h-48 overflow-y-auto no-scrollbar shadow-lg"
                                                         >
                                                             {searchResults.map((user) => (
                                                                 <button
                                                                     key={user.id}
                                                                     onClick={() => handleAddMember(user.email)}
                                                                     disabled={addingMember}
-                                                                    className="w-full flex items-center justify-between p-2 hover:bg-white/5 rounded-xl transition-all text-left group"
+                                                                    className="w-full flex items-center justify-between p-2 hover:bg-muted/20 rounded-xl transition-all text-left group"
                                                                 >
                                                                     <div className="flex items-center gap-3">
-                                                                        <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                                                        <div className="w-8 h-8 rounded-lg bg-accent-color/20 border border-accent-color/30 flex items-center justify-center text-[10px] font-bold text-accent-color group-hover:bg-accent-color group-hover:text-white transition-all">
                                                                             {user.name.charAt(0).toUpperCase()}
                                                                         </div>
                                                                         <div className="flex flex-col">
-                                                                            <span className="text-xs font-bold text-white leading-none mb-1">{user.name}</span>
-                                                                            <span className="text-[10px] text-zinc-500 leading-none">{user.email}</span>
+                                                                            <span className="text-xs font-bold text-foreground leading-none mb-1">{user.name}</span>
+                                                                            <span className="text-[10px] text-muted-foreground leading-none">{user.email}</span>
                                                                         </div>
                                                                     </div>
                                                                     {processingEmail === user.email ? (
-                                                                        <div className="flex items-center gap-2 px-2 py-1 bg-indigo-500/10 rounded-lg">
-                                                                            <span className="text-[10px] font-bold text-indigo-400">Adding...</span>
-                                                                            <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
+                                                                        <div className="flex items-center gap-2 px-2 py-1 bg-accent-color/10 rounded-lg">
+                                                                            <span className="text-[10px] font-bold text-accent-color">Adding...</span>
+                                                                            <Loader2 className="w-3 h-3 text-accent-color animate-spin" />
                                                                         </div>
                                                                     ) : (
-                                                                        <UserPlus className="w-4 h-4 text-zinc-700 group-hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all" />
+                                                                        <UserPlus className="w-4 h-4 text-muted-foreground group-hover:text-accent-color opacity-0 group-hover:opacity-100 transition-all" />
                                                                     )}
                                                                 </button>
                                                             ))}
@@ -244,27 +244,27 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                         )}
 
                                         <div className="space-y-1 max-h-64 overflow-y-auto no-scrollbar">
-                                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-3 px-1">Current Team</p>
+                                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3 px-1">Current Team</p>
                                             {board.members.map((m) => (
-                                                <div key={m.id} className="flex items-center justify-between p-2 hover:bg-white/5 rounded-2xl group/member transition-colors">
+                                                <div key={m.id} className="flex items-center justify-between p-2 hover:bg-muted/10 rounded-2xl group/member transition-colors">
                                                     <div className="flex items-center gap-3">
                                                         <div className="relative">
-                                                            <div className="w-10 h-10 bg-zinc-900 border border-white/5 rounded-xl flex items-center justify-center text-xs font-black text-white">
+                                                            <div className="w-10 h-10 bg-background border border-border rounded-xl flex items-center justify-center text-xs font-black text-foreground">
                                                                 {m.user.name.charAt(0).toUpperCase()}
                                                             </div>
                                                             {m.user.id === currentUser.id && (
-                                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-zinc-950 rounded-full" />
+                                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-background rounded-full" />
                                                             )}
                                                         </div>
                                                         <div className="flex flex-col">
-                                                            <p className="text-sm font-bold text-white">
+                                                            <p className="text-sm font-bold text-foreground">
                                                                 {m.user.name}
-                                                                {m.user.id === currentUser.id && <span className="ml-1.5 text-[10px] text-zinc-500 font-medium">(You)</span>}
+                                                                {m.user.id === currentUser.id && <span className="ml-1.5 text-[10px] text-muted-foreground font-medium">(You)</span>}
                                                             </p>
-                                                            <p className="text-[10px] text-zinc-500 font-medium">{m.user.email}</p>
+                                                            <p className="text-[10px] text-muted-foreground font-medium">{m.user.email}</p>
                                                         </div>
                                                     </div>
-                                                    <div className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg ${m.role === 'ADMIN' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <div className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg ${m.role === 'ADMIN' ? 'bg-accent-color/10 text-accent-color border border-accent-color/20' : 'bg-muted/30 text-muted-foreground'}`}>
                                                         {m.role}
                                                     </div>
                                                 </div>
@@ -281,7 +281,7 @@ export default function BoardHeader({ board, currentUser }: Props) {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowSettings(!showSettings)}
-                            className="p-3 bg-white/5 border border-white/10 rounded-2xl text-zinc-500 hover:text-indigo-400 hover:bg-white/10 transition-all shadow-inner group"
+                            className="p-3 bg-muted/10 border border-border rounded-2xl text-muted-foreground hover:text-accent-color hover:bg-muted/20 transition-all shadow-inner group"
                         >
                             <Settings className="w-5 h-5 group-hover:rotate-45 transition-transform duration-500" />
                         </motion.button>
@@ -292,32 +292,32 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                     initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                    className="absolute right-0 mt-4 w-64 bg-zinc-950 border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden p-2"
+                                    className="absolute right-0 mt-4 w-64 bg-card border border-border rounded-3xl shadow-2xl z-50 overflow-hidden p-2 transition-colors"
                                 >
-                                    <div className="px-3 py-2 border-b border-white/5 mb-1">
-                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Board Settings</p>
+                                    <div className="px-3 py-2 border-b border-border mb-1">
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Board Settings</p>
                                     </div>
                                     <button
                                         onClick={() => {
                                             setIsEditing(true);
                                             setShowSettings(false);
                                         }}
-                                        className="w-full flex items-center gap-3 px-3 py-2.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-xs font-medium group"
+                                        className="w-full flex items-center gap-3 px-3 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted/20 rounded-xl transition-all text-xs font-medium group"
                                     >
-                                        <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center">
+                                        <div className="w-7 h-7 bg-muted/20 rounded-lg flex items-center justify-center group-hover:bg-accent-color/10 group-hover:text-accent-color">
                                             <Hash className="w-3.5 h-3.5" />
                                         </div>
                                         Rename Board
                                     </button>
                                     <button
-                                        className="w-full flex items-center gap-3 px-3 py-2.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-xs font-medium group"
+                                        className="w-full flex items-center gap-3 px-3 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted/20 rounded-xl transition-all text-xs font-medium group"
                                     >
-                                        <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-zinc-600 group-hover:text-indigo-400">
+                                        <div className="w-7 h-7 bg-muted/20 rounded-lg flex items-center justify-center group-hover:bg-accent-color/10 group-hover:text-accent-color">
                                             <Users className="w-3.5 h-3.5" />
                                         </div>
                                         Manage Roles
                                     </button>
-                                    <div className="h-px bg-white/5 my-1 mx-2" />
+                                    <div className="h-px bg-border my-1 mx-2" />
                                     <button
                                         className="w-full flex items-center gap-3 px-3 py-2.5 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all text-xs font-bold group"
                                     >
