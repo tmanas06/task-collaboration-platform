@@ -1,8 +1,6 @@
 import { Server, Socket } from 'socket.io';
-import jwt from 'jsonwebtoken';
+import { auth } from '../config/firebase';
 import { AuthPayload } from '../types';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 
 interface AuthenticatedSocket extends Socket {
     user?: AuthPayload;
@@ -10,7 +8,7 @@ interface AuthenticatedSocket extends Socket {
 
 export const setupSocketHandlers = (io: Server) => {
     // Authentication middleware for Socket.IO
-    io.use((socket: AuthenticatedSocket, next) => {
+    io.use(async (socket: AuthenticatedSocket, next) => {
         const token = socket.handshake.auth.token;
 
         if (!token) {
@@ -18,10 +16,12 @@ export const setupSocketHandlers = (io: Server) => {
         }
 
         try {
-            const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
-            socket.user = decoded;
+            const decodedToken = await auth.verifyIdToken(token);
+            // In Firebase flow, the payload uses 'uid'
+            socket.user = { userId: decodedToken.uid, email: decodedToken.email || '', role: 'MEMBER' };
             next();
         } catch (error) {
+            console.error('Socket Auth Error:', error);
             next(new Error('Invalid token'));
         }
     });

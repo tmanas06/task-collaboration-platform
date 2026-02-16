@@ -19,7 +19,10 @@ export const authMiddleware = async (
         }
 
         const token = authHeader.split(' ')[1];
+        console.log(`Auth middleware: Verifying token for request to ${req.path}`);
+
         const decodedToken = await auth.verifyIdToken(token);
+        console.log(`Auth middleware: Token verified for UID ${decodedToken.uid}`);
 
         // Always attach firebaseUser for sync and other logic
         req.firebaseUser = decodedToken;
@@ -30,8 +33,11 @@ export const authMiddleware = async (
         });
 
         if (user) {
+            console.log(`Auth middleware: Found DB user ${user.id}`);
             // Attach DB user
             req.user = { userId: user.id, email: user.email, role: 'MEMBER' };
+        } else {
+            console.warn(`Auth middleware: No DB user found for UID ${decodedToken.uid}`);
         }
 
         next();

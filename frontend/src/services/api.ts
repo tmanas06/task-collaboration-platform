@@ -26,10 +26,13 @@ api.interceptors.request.use(async (config) => {
     if (user) {
         try {
             const token = await user.getIdToken();
+            console.log(`API Interceptor: Attaching token for ${config.url}`);
             config.headers.Authorization = `Bearer ${token}`;
         } catch (error) {
             console.error('Error getting token', error);
         }
+    } else {
+        console.warn(`API Interceptor: No active Firebase user for ${config.url}`);
     }
     return config;
 });

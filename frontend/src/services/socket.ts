@@ -10,6 +10,7 @@ class SocketService {
             return this.socket;
         }
 
+        console.log(`SocketService: Connecting to ${WS_URL} with token...`);
         this.socket = io(WS_URL, {
             auth: { token },
             transports: ['websocket', 'polling'],
