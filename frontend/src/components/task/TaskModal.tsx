@@ -16,7 +16,11 @@ export default function TaskModal({ task, boardMembers, onClose }: Props) {
     );
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-    const { updateTask, deleteTask, assignTask, unassignTask, fetchTask } = useBoardStore();
+    const updateTask = useBoardStore(state => state.updateTask);
+    const deleteTask = useBoardStore(state => state.deleteTask);
+    const assignTask = useBoardStore(state => state.assignTask);
+    const unassignTask = useBoardStore(state => state.unassignTask);
+    const fetchTask = useBoardStore(state => state.fetchTask);
 
     useEffect(() => {
         const loadDetails = async () => {
@@ -100,16 +104,27 @@ export default function TaskModal({ task, boardMembers, onClose }: Props) {
 
                     {/* Description */}
                     <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-1.5">Description</label>
-                        {isLoadingDetails ? (
-                            <div className="w-full h-32 bg-muted/10 animate-pulse rounded-xl flex items-center justify-center">
-                                <span className="text-xs text-muted-foreground">Loading details...</span>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-sm font-medium text-muted-foreground">Description</label>
+                            {isLoadingDetails && (
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 bg-accent-color rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                    <div className="w-1.5 h-1.5 bg-accent-color rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                    <div className="w-1.5 h-1.5 bg-accent-color rounded-full animate-bounce" />
+                                </div>
+                            )}
+                        </div>
+                        {isLoadingDetails && !description ? (
+                            <div className="space-y-3">
+                                <div className="h-4 bg-muted/20 rounded-md animate-pulse w-full" />
+                                <div className="h-4 bg-muted/20 rounded-md animate-pulse w-[90%]" />
+                                <div className="h-4 bg-muted/20 rounded-md animate-pulse w-[70%]" />
                             </div>
                         ) : (
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-accent-color focus:border-transparent outline-none transition-all resize-none"
+                                className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-accent-color focus:border-transparent outline-none transition-all resize-none min-h-[120px]"
                                 rows={4}
                                 placeholder="Add a description..."
                             />

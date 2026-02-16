@@ -21,7 +21,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function BoardPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { currentBoard, isLoading, error, fetchBoard, moveTask, clearCurrentBoard } = useBoardStore();
+
+    // Use individual selectors for stability
+    const currentBoard = useBoardStore(state => state.currentBoard);
+    const isLoading = useBoardStore(state => state.isLoading);
+    const error = useBoardStore(state => state.error);
+    const fetchBoard = useBoardStore(state => state.fetchBoard);
+    const moveTask = useBoardStore(state => state.moveTask);
+    const clearCurrentBoard = useBoardStore(state => state.clearCurrentBoard);
+
     const { user } = useAuth();
     const [showActivity, setShowActivity] = useState(false);
     useSocket(id);
@@ -31,9 +39,13 @@ export default function BoardPage() {
     );
 
     useEffect(() => {
-        if (id) fetchBoard(id);
-        return () => clearCurrentBoard();
-    }, [id, fetchBoard, clearCurrentBoard]);
+        if (id) {
+            fetchBoard(id);
+        }
+        return () => {
+            clearCurrentBoard();
+        };
+    }, [id]); // Only re-run if ID changes
 
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
@@ -81,22 +93,11 @@ export default function BoardPage() {
         );
     }
 
-    if (error || !currentBoard) {
+    if (!currentBoard) {
         return (
             <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
                 <Navbar />
-                <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-6 p-6 text-center">
-                    <div className="w-20 h-20 bg-rose-500/10 rounded-3xl flex items-center justify-center border border-rose-500/20">
-                        <span className="text-4xl text-rose-500 font-bold">!</span>
-                    </div>
-                    <p className="text-xl font-bold text-foreground">{error || 'Project not found'}</p>
-                    <button
-                        onClick={() => navigate('/')}
-                        className="px-8 py-3 bg-muted/20 border border-border text-foreground font-bold rounded-2xl hover:bg-muted/30 transition-all"
-                    >
-                        Back to Workspace
-                    </button>
-                </div>
+                <div className="flex-1" />
             </div>
         );
     }

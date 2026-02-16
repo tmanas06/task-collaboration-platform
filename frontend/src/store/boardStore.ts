@@ -365,7 +365,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
             });
             return task;
         } catch (error: any) {
-            set({ error: error.response?.data?.error || 'Failed to fetch task' });
+            console.error('Failed to fetch task:', error);
             throw error;
         }
     },
