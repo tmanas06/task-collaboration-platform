@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     DndContext,
     DragEndEvent,
-    DragOverEvent,
-    DragStartEvent,
     PointerSensor,
     useSensor,
     useSensors,
@@ -16,8 +14,8 @@ import { useAuth } from '../hooks/useAuth';
 import BoardHeader from '../components/board/BoardHeader';
 import ListColumn from '../components/list/ListColumn';
 import CreateListButton from '../components/list/CreateListButton';
-import LoadingSpinner from '../components/common/LoadingSpinner';
 import Navbar from '../components/common/Navbar';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function BoardPage() {
     const { id } = useParams<{ id: string }>();
@@ -33,7 +31,7 @@ export default function BoardPage() {
     useEffect(() => {
         if (id) fetchBoard(id);
         return () => clearCurrentBoard();
-    }, [id]);
+    }, [id, fetchBoard, clearCurrentBoard]);
 
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
@@ -48,19 +46,16 @@ export default function BoardPage() {
             let targetPosition: number;
 
             if (over.data.current?.type === 'list') {
-                // Dropped on an empty list
                 targetListId = over.data.current.listId;
                 const targetList = currentBoard.lists.find((l) => l.id === targetListId);
                 targetPosition = targetList?.tasks.length || 0;
             } else {
-                // Dropped on a task
                 const overTask = over.data.current?.task;
                 if (!overTask) return;
                 targetListId = overTask.listId;
                 targetPosition = overTask.position;
             }
 
-            // Only move if something actually changed
             if (activeTask.listId === targetListId && activeTask.position === targetPosition) {
                 return;
             }
@@ -72,10 +67,13 @@ export default function BoardPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-dark-950">
+            <div className="min-h-screen bg-[#030303]">
                 <Navbar />
                 <div className="flex items-center justify-center h-[calc(100vh-64px)]">
-                    <LoadingSpinner size="lg" />
+                    <div className="relative">
+                        <div className="w-12 h-12 border-4 border-white/5 border-t-indigo-500 rounded-full animate-spin" />
+                        <div className="absolute inset-0 blur-xl bg-indigo-500/20 animate-pulse" />
+                    </div>
                 </div>
             </div>
         );
@@ -83,15 +81,18 @@ export default function BoardPage() {
 
     if (error || !currentBoard) {
         return (
-            <div className="min-h-screen bg-dark-950">
+            <div className="min-h-screen bg-[#030303]">
                 <Navbar />
-                <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-4">
-                    <p className="text-red-400">{error || 'Board not found'}</p>
+                <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-6 p-6">
+                    <div className="w-20 h-20 bg-rose-500/10 rounded-3xl flex items-center justify-center border border-rose-500/20">
+                        <span className="text-4xl text-rose-500 font-bold">!</span>
+                    </div>
+                    <p className="text-xl font-bold text-white">{error || 'Project not found'}</p>
                     <button
                         onClick={() => navigate('/')}
-                        className="px-4 py-2 bg-dark-800 text-white rounded-lg hover:bg-dark-700 transition-colors"
+                        className="px-8 py-3 bg-zinc-900 border border-white/10 text-white font-bold rounded-2xl hover:bg-zinc-800 transition-all"
                     >
-                        Back to Dashboard
+                        Back to Workspace
                     </button>
                 </div>
             </div>
@@ -99,31 +100,65 @@ export default function BoardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-dark-950 flex flex-col">
-            <Navbar />
-            <BoardHeader board={currentBoard} currentUser={user!} />
-
-            {/* Board content - scrollable horizontally */}
-            <div className="flex-1 overflow-x-auto overflow-y-hidden">
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCorners}
-                    onDragEnd={handleDragEnd}
-                >
-                    <div className="flex gap-4 p-6 h-[calc(100vh-140px)] items-start">
-                        {currentBoard.lists
-                            .sort((a, b) => a.position - b.position)
-                            .map((list) => (
-                                <ListColumn
-                                    key={list.id}
-                                    list={list}
-                                    boardMembers={currentBoard.members}
-                                />
-                            ))}
-                        <CreateListButton boardId={currentBoard.id} />
-                    </div>
-                </DndContext>
+        <div className="min-h-screen bg-[#030303] flex flex-col relative overflow-hidden">
+            {/* Parallax Background Background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-purple-600/5 blur-[100px] rounded-full delay-1000 animate-pulse" />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-50" />
             </div>
+
+            <Navbar />
+
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex-1 flex flex-col relative z-10"
+            >
+                <BoardHeader board={currentBoard} currentUser={user!} />
+
+                <div className="flex-1 min-h-0 overflow-x-auto overflow-y-hidden no-scrollbar">
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCorners}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <motion.div
+                            initial={{ x: 50, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                            className="flex gap-6 p-8 h-full min-w-max items-start"
+                        >
+                            <AnimatePresence>
+                                {currentBoard.lists
+                                    .sort((a, b) => a.position - b.position)
+                                    .map((list, idx) => (
+                                        <motion.div
+                                            key={list.id}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.1 * idx }}
+                                        >
+                                            <ListColumn
+                                                list={list}
+                                                boardMembers={currentBoard.members}
+                                            />
+                                        </motion.div>
+                                    ))}
+                            </AnimatePresence>
+
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.8 }}
+                                className="w-[320px] shrink-0"
+                            >
+                                <CreateListButton boardId={currentBoard.id} />
+                            </motion.div>
+                        </motion.div>
+                    </DndContext>
+                </div>
+            </motion.div>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-arm64-openssl-1.1.x", "linux-musl-arm64-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
@@ -9,35 +9,33 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  firebaseUid String? @unique
-  password  String?
-  name      String
-  avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  boards       BoardMember[]
+  id            String         @id @default(uuid())
+  email         String         @unique
+  firebaseUid   String?        @unique
+  password      String?
+  name          String
+  avatar        String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  activities    Activity[]
   createdBoards Board[]
-  activities   Activity[]
+  boards        BoardMember[]
   assignedTasks TaskAssignee[]
 
   @@index([email])
 }
 
 model Board {
-  id          String   @id @default(uuid())
+  id          String        @id @default(uuid())
   title       String
   description String?
   createdById String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  createdBy  User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  members    BoardMember[]
-  lists      List[]
-  activities Activity[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  activities  Activity[]
+  createdBy   User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  members     BoardMember[]
+  lists       List[]
 
   @@index([createdById])
   @@index([title])
@@ -49,18 +47,12 @@ model BoardMember {
   userId   String
   role     Role     @default(MEMBER)
   joinedAt DateTime @default(now())
-
-  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  board    Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([boardId, userId])
   @@index([boardId])
   @@index([userId])
-}
-
-enum Role {
-  ADMIN
-  MEMBER
 }
 
 model List {
@@ -70,26 +62,24 @@ model List {
   boardId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  board Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  tasks Task[]
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks     Task[]
 
   @@index([boardId])
   @@index([position])
 }
 
 model Task {
-  id          String    @id @default(uuid())
+  id          String         @id @default(uuid())
   title       String
   description String?
   position    Int
   listId      String
   dueDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  list      List           @relation(fields: [listId], references: [id], onDelete: Cascade)
-  assignees TaskAssignee[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  list        List           @relation(fields: [listId], references: [id], onDelete: Cascade)
+  assignees   TaskAssignee[]
 
   @@index([listId])
   @@index([position])
@@ -100,13 +90,34 @@ model TaskAssignee {
   taskId     String
   userId     String
   assignedAt DateTime @default(now())
-
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, userId])
   @@index([taskId])
   @@index([userId])
+}
+
+model Activity {
+  id         String     @id @default(uuid())
+  action     ActionType
+  entityType String
+  entityId   String
+  metadata   Json?
+  userId     String
+  boardId    String
+  createdAt  DateTime   @default(now())
+  board      Board      @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([boardId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum Role {
+  ADMIN
+  MEMBER
 }
 
 enum ActionType {
@@ -124,22 +135,4 @@ enum ActionType {
   TASK_UNASSIGNED
   MEMBER_ADDED
   MEMBER_REMOVED
-}
-
-model Activity {
-  id         String     @id @default(uuid())
-  action     ActionType
-  entityType String
-  entityId   String
-  metadata   Json?
-  userId     String
-  boardId    String
-  createdAt  DateTime   @default(now())
-
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
-
-  @@index([boardId])
-  @@index([userId])
-  @@index([createdAt])
 }

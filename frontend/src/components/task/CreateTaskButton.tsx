@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useBoardStore } from '../../store/boardStore';
+import { Plus, X, CornerDownLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
     listId: string;
@@ -11,8 +13,8 @@ export default function CreateTaskButton({ listId }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const { createTask } = useBoardStore();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (e?: React.FormEvent) => {
+        e?.preventDefault();
         if (!title.trim()) return;
 
         setIsLoading(true);
@@ -27,53 +29,65 @@ export default function CreateTaskButton({ listId }: Props) {
         }
     };
 
-    if (!isOpen) {
-        return (
-            <button
-                onClick={() => setIsOpen(true)}
-                className="w-full py-2 text-sm text-dark-400 hover:text-white hover:bg-dark-700/50 rounded-lg transition-colors flex items-center justify-center gap-1"
-            >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Add task
-            </button>
-        );
-    }
-
     return (
-        <form onSubmit={handleSubmit} className="p-2">
-            <textarea
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 bg-dark-800 border border-dark-600 rounded-lg text-sm text-white placeholder-dark-500 focus:ring-2 focus:ring-primary-500 outline-none resize-none"
-                rows={2}
-                placeholder="Enter task title..."
-                autoFocus
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSubmit(e);
-                    }
-                    if (e.key === 'Escape') setIsOpen(false);
-                }}
-            />
-            <div className="flex gap-2 mt-2">
-                <button
-                    type="submit"
-                    disabled={isLoading || !title.trim()}
-                    className="px-3 py-1.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-500 disabled:opacity-50 transition-colors"
+        <AnimatePresence mode="wait">
+            {!isOpen ? (
+                <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    onClick={() => setIsOpen(true)}
+                    className="w-full py-3 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-indigo-400 hover:bg-indigo-500/5 rounded-xl transition-all flex items-center justify-center gap-2 group"
                 >
-                    {isLoading ? '...' : 'Add'}
-                </button>
-                <button
-                    type="button"
-                    onClick={() => { setIsOpen(false); setTitle(''); }}
-                    className="px-3 py-1.5 text-dark-400 hover:text-white text-sm rounded-lg hover:bg-dark-700 transition-colors"
+                    <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    Add Task
+                </motion.button>
+            ) : (
+                <motion.form
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    onSubmit={handleSubmit}
+                    className="p-1 space-y-3"
                 >
-                    Cancel
-                </button>
-            </div>
-        </form>
+                    <div className="relative">
+                        <textarea
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className="w-full px-4 py-3 bg-zinc-950 border border-white/10 rounded-xl text-sm font-bold text-white placeholder-zinc-700 focus:border-indigo-500/50 outline-none resize-none shadow-inner"
+                            rows={3}
+                            placeholder="Enter task title..."
+                            autoFocus
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSubmit();
+                                }
+                                if (e.key === 'Escape') setIsOpen(false);
+                            }}
+                        />
+                        <div className="absolute bottom-3 right-3 flex items-center gap-1 opacity-20">
+                            <span className="text-[10px] font-bold text-zinc-500">Return</span>
+                            <CornerDownLeft className="w-3 h-3 text-zinc-500" />
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            type="submit"
+                            disabled={isLoading || !title.trim()}
+                            className="flex-1 py-2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-all shadow-lg shadow-indigo-500/20"
+                        >
+                            {isLoading ? '...' : 'Add Task'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setIsOpen(false); setTitle(''); }}
+                            className="p-2 text-zinc-500 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+                </motion.form>
+            )}
+        </AnimatePresence>
     );
 }

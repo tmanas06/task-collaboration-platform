@@ -33,6 +33,7 @@ export interface Task {
     createdAt: string;
     updatedAt: string;
     assignees: TaskAssignee[];
+    priority?: 'HIGH' | 'MEDIUM' | 'LOW';
 }
 
 export interface List {

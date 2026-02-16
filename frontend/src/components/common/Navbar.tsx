@@ -1,6 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useSocketStore } from '../../store/socketStore';
+import { LogOut, Layout, User as UserIcon, Activity } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -13,52 +15,70 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="bg-dark-900 border-b border-dark-700 sticky top-0 z-50 backdrop-blur-xl bg-opacity-80">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.nav
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/40 backdrop-blur-xl"
+        >
+            <div className="max-w-[1800px] mx-auto px-6">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
-                    <Link to="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-shadow">
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <div className="relative w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.3)] group-hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] transition-all duration-300 group-hover:rotate-3">
+                            <Layout className="w-5 h-5 text-white" />
+                            <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
+                        <span className="text-xl font-bold tracking-tight gradient-text">
                             TaskFlow
                         </span>
                     </Link>
 
                     {/* Right side */}
-                    <div className="flex items-center gap-4">
-                        {/* Connection indicator */}
-                        <div className="flex items-center gap-1.5">
-                            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 shadow-lg shadow-emerald-400/50' : 'bg-red-400'}`} />
-                            <span className="text-xs text-dark-400 hidden sm:inline">
-                                {isConnected ? 'Live' : 'Offline'}
+                    <div className="flex items-center gap-6">
+                        {/* Status Indicator */}
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5">
+                            <motion.div
+                                animate={{
+                                    scale: isConnected ? [1, 1.2, 1] : 1,
+                                    opacity: isConnected ? [1, 0.7, 1] : 1
+                                }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                                className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]' : 'bg-rose-400'}`}
+                            />
+                            <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400">
+                                {isConnected ? 'Synchronized' : 'Disconnected'}
                             </span>
                         </div>
 
-                        {/* User info */}
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-sm font-medium text-white shadow-md">
-                                {user?.name?.charAt(0).toUpperCase()}
+                        {/* User Profile */}
+                        <div className="flex items-center gap-4 pl-4 border-l border-white/10">
+                            <div className="flex items-center gap-2 group cursor-pointer">
+                                <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center text-xs font-bold text-white group-hover:border-indigo-500/50 transition-colors">
+                                    {user?.name?.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="hidden sm:flex flex-col">
+                                    <span className="text-xs font-semibold text-zinc-100 leading-tight">{user?.name}</span>
+                                    <span className="text-[10px] text-zinc-500 leading-tight">Pro Account</span>
+                                </div>
                             </div>
-                            <span className="text-sm font-medium text-dark-200 hidden sm:inline">{user?.name}</span>
-                        </div>
 
-                        {/* Logout */}
-                        <button
-                            onClick={handleLogout}
-                            className="text-dark-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-dark-800"
-                            title="Logout"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
-                        </button>
+                            {/* Actions */}
+                            <div className="flex items-center gap-1">
+                                <button className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">
+                                    <Activity className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={handleLogout}
+                                    className="p-2 text-zinc-400 hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-all"
+                                    title="Logout"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </nav>
+        </motion.nav>
     );
 }
