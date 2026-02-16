@@ -22,6 +22,7 @@ export default function BoardHeader({ board, currentUser }: Props) {
     const [isSearching, setIsSearching] = useState(false);
     const debouncedSearch = useDebounce(memberEmail, 300);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const [processingEmail, setProcessingEmail] = useState<string | null>(null);
 
     const { updateBoard, fetchBoard } = useBoardStore();
 
@@ -59,6 +60,7 @@ export default function BoardHeader({ board, currentUser }: Props) {
 
     const handleAddMember = async (email: string) => {
         setAddingMember(true);
+        setProcessingEmail(email);
         setMemberError('');
         try {
             await boardsApi.addMember(board.id, { email });
@@ -69,6 +71,7 @@ export default function BoardHeader({ board, currentUser }: Props) {
             setMemberError(err.response?.data?.error || 'Failed to add member');
         } finally {
             setAddingMember(false);
+            setProcessingEmail(null);
         }
     };
 
@@ -198,15 +201,25 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                                                     key={user.id}
                                                                     onClick={() => handleAddMember(user.email)}
                                                                     disabled={addingMember}
-                                                                    className="w-full flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors text-left"
+                                                                    className="w-full flex items-center justify-between p-2 hover:bg-white/5 rounded-xl transition-all text-left group"
                                                                 >
-                                                                    <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-[10px] font-bold text-white">
-                                                                        {user.name.charAt(0).toUpperCase()}
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                                                            {user.name.charAt(0).toUpperCase()}
+                                                                        </div>
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-xs font-bold text-white leading-none mb-1">{user.name}</span>
+                                                                            <span className="text-[10px] text-zinc-500 leading-none">{user.email}</span>
+                                                                        </div>
                                                                     </div>
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-xs font-bold text-white">{user.name}</span>
-                                                                        <span className="text-[10px] text-zinc-500">{user.email}</span>
-                                                                    </div>
+                                                                    {processingEmail === user.email ? (
+                                                                        <div className="flex items-center gap-2 px-2 py-1 bg-indigo-500/10 rounded-lg">
+                                                                            <span className="text-[10px] font-bold text-indigo-400">Adding...</span>
+                                                                            <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <UserPlus className="w-4 h-4 text-zinc-700 group-hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all" />
+                                                                    )}
                                                                 </button>
                                                             ))}
                                                         </motion.div>
