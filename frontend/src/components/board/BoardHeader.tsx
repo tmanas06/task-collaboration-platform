@@ -20,8 +20,10 @@ export default function BoardHeader({ board, currentUser }: Props) {
     const [memberError, setMemberError] = useState('');
     const [searchResults, setSearchResults] = useState<User[]>([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
     const debouncedSearch = useDebounce(memberEmail, 300);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const settingsRef = useRef<HTMLDivElement>(null);
     const [processingEmail, setProcessingEmail] = useState<string | null>(null);
 
     const { updateBoard, fetchBoard } = useBoardStore();
@@ -29,6 +31,16 @@ export default function BoardHeader({ board, currentUser }: Props) {
     const isAdmin = board.members.some(
         (m) => m.userId === currentUser.id && m.role === 'ADMIN'
     );
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
+                setShowSettings(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const searchUsers = async () => {
@@ -264,9 +276,60 @@ export default function BoardHeader({ board, currentUser }: Props) {
                         </AnimatePresence>
                     </div>
 
-                    <button className="p-3 bg-white/5 border border-white/10 rounded-2xl text-zinc-500 hover:text-white hover:bg-white/10 transition-all shadow-inner">
-                        <Settings className="w-5 h-5" />
-                    </button>
+                    <div className="relative" ref={settingsRef}>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowSettings(!showSettings)}
+                            className="p-3 bg-white/5 border border-white/10 rounded-2xl text-zinc-500 hover:text-indigo-400 hover:bg-white/10 transition-all shadow-inner group"
+                        >
+                            <Settings className="w-5 h-5 group-hover:rotate-45 transition-transform duration-500" />
+                        </motion.button>
+
+                        <AnimatePresence>
+                            {showSettings && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                    className="absolute right-0 mt-4 w-64 bg-zinc-950 border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden p-2"
+                                >
+                                    <div className="px-3 py-2 border-b border-white/5 mb-1">
+                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Board Settings</p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setIsEditing(true);
+                                            setShowSettings(false);
+                                        }}
+                                        className="w-full flex items-center gap-3 px-3 py-2.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-xs font-medium group"
+                                    >
+                                        <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center">
+                                            <Hash className="w-3.5 h-3.5" />
+                                        </div>
+                                        Rename Board
+                                    </button>
+                                    <button
+                                        className="w-full flex items-center gap-3 px-3 py-2.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-xs font-medium group"
+                                    >
+                                        <div className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-zinc-600 group-hover:text-indigo-400">
+                                            <Users className="w-3.5 h-3.5" />
+                                        </div>
+                                        Manage Roles
+                                    </button>
+                                    <div className="h-px bg-white/5 my-1 mx-2" />
+                                    <button
+                                        className="w-full flex items-center gap-3 px-3 py-2.5 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all text-xs font-bold group"
+                                    >
+                                        <div className="w-7 h-7 bg-rose-500/10 rounded-lg flex items-center justify-center text-rose-500">
+                                            <X className="w-3.5 h-3.5" />
+                                        </div>
+                                        Delete Project
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
             </div>
         </div>
