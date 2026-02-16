@@ -115,4 +115,10 @@ export const tasksApi = {
         api.delete(`/tasks/${taskId}/assign/${userId}`).then((r) => r.data),
 };
 
+// Users
+export const usersApi = {
+    search: (q: string) =>
+        api.get<ApiResponse<User[]>>('/users/search', { params: { q } }).then((r) => r.data.data),
+};
+
 export default api;

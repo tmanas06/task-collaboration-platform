@@ -8,6 +8,7 @@ import authRoutes from './routes/auth';
 import boardRoutes from './routes/boards';
 import listRoutes from './routes/lists';
 import taskRoutes from './routes/tasks';
+import userRoutes from './routes/users';
 
 const app = express();
 const httpServer = createServer(app);
@@ -45,6 +46,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/boards', boardRoutes);
 app.use('/api/lists', listRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
 
 // Error handling
 app.use(errorHandler);
