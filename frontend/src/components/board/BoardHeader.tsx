@@ -2,16 +2,17 @@ import { useState, useEffect, useRef } from 'react';
 import type { Board, User } from '../../types';
 import { useBoardStore } from '../../store/boardStore';
 import { boardsApi, usersApi } from '../../services/api';
-import { Users, UserPlus, Settings, Hash, ChevronDown, Check, X, Search, Loader2 } from 'lucide-react';
+import { Users, UserPlus, Settings, Hash, ChevronDown, Check, X, Search, Loader2, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDebounce } from '../../hooks/useDebounce';
 
 interface Props {
     board: Board;
     currentUser: User;
+    onToggleActivity: () => void;
 }
 
-export default function BoardHeader({ board, currentUser }: Props) {
+export default function BoardHeader({ board, currentUser, onToggleActivity }: Props) {
     const [isEditing, setIsEditing] = useState(false);
     const [title, setTitle] = useState(board.title);
     const [showMembers, setShowMembers] = useState(false);
@@ -124,7 +125,7 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                     <motion.h1
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className={`text-3xl font-black tracking-tight text-foreground ${isAdmin ? 'cursor-pointer hover:text-accent-color transition-colors' : ''}`}
+                                        className={`text - 3xl font - black tracking - tight text - foreground ${isAdmin ? 'cursor-pointer hover:text-accent-color transition-colors' : ''} `}
                                         onClick={() => isAdmin && setIsEditing(true)}
                                     >
                                         {board.title}
@@ -163,7 +164,7 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                 )}
                             </div>
                             <span className="text-sm font-bold text-foreground/80">Share</span>
-                            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showMembers ? 'rotate-180' : ''}`} />
+                            <ChevronDown className={`w - 4 h - 4 text - muted - foreground transition - transform ${showMembers ? 'rotate-180' : ''} `} />
                         </motion.button>
 
                         <AnimatePresence>
@@ -264,7 +265,7 @@ export default function BoardHeader({ board, currentUser }: Props) {
                                                             <p className="text-[10px] text-muted-foreground font-medium">{m.user.email}</p>
                                                         </div>
                                                     </div>
-                                                    <div className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg ${m.role === 'ADMIN' ? 'bg-accent-color/10 text-accent-color border border-accent-color/20' : 'bg-muted/30 text-muted-foreground'}`}>
+                                                    <div className={`text - [9px] font - black uppercase tracking - widest px - 2 py - 1 rounded - lg ${m.role === 'ADMIN' ? 'bg-accent-color/10 text-accent-color border border-accent-color/20' : 'bg-muted/30 text-muted-foreground'} `}>
                                                         {m.role}
                                                     </div>
                                                 </div>
@@ -275,6 +276,16 @@ export default function BoardHeader({ board, currentUser }: Props) {
                             )}
                         </AnimatePresence>
                     </div>
+
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={onToggleActivity}
+                        className="p-3 bg-muted/10 border border-border rounded-2xl text-muted-foreground hover:text-accent-color hover:bg-muted/20 transition-all shadow-inner group"
+                        title="View Activity"
+                    >
+                        <Clock className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    </motion.button>
 
                     <div className="relative" ref={settingsRef}>
                         <motion.button

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { boardsApi, listsApi, tasksApi } from '../services/api';
-import type { Board, List, Task, Pagination } from '../types';
+import type { Board, List, Task, Pagination, Activity } from '../types';
 
 interface BoardState {
     boards: Board[];
@@ -8,6 +8,8 @@ interface BoardState {
     pagination: Pagination | null;
     isLoading: boolean;
     error: string | null;
+    activities: Activity[];
+    activityPagination: Pagination | null;
 
     // Board CRUD
     fetchBoards: (page?: number, limit?: number, search?: string) => Promise<void>;
@@ -15,6 +17,7 @@ interface BoardState {
     createBoard: (title: string, description?: string) => Promise<Board>;
     updateBoard: (id: string, data: { title?: string; description?: string }) => Promise<void>;
     deleteBoard: (id: string) => Promise<void>;
+    fetchActivities: (id: string, page?: number, limit?: number) => Promise<void>;
 
     // List CRUD
     createList: (title: string, boardId: string) => Promise<void>;
@@ -49,6 +52,8 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     pagination: null,
     isLoading: false,
     error: null,
+    activities: [],
+    activityPagination: null,
 
     // ───── Board CRUD ─────
 
@@ -106,6 +111,20 @@ export const useBoardStore = create<BoardState>((set, get) => ({
         } catch (error: any) {
             set({ error: error.response?.data?.error || 'Failed to delete board' });
             throw error;
+        }
+    },
+
+    fetchActivities: async (id: string, page = 1, limit = 20) => {
+        set({ isLoading: true, error: null });
+        try {
+            const result = await boardsApi.getActivities(id, page, limit);
+            set((state) => ({
+                activities: page === 1 ? result.data : [...state.activities, ...result.data],
+                activityPagination: result.pagination,
+                isLoading: false,
+            }));
+        } catch (error: any) {
+            set({ error: error.response?.data?.error || 'Failed to fetch activities', isLoading: false });
         }
     },
 

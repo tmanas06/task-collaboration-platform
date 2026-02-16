@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     DndContext,
@@ -14,6 +14,7 @@ import { useAuth } from '../hooks/useAuth';
 import BoardHeader from '../components/board/BoardHeader';
 import ListColumn from '../components/list/ListColumn';
 import CreateListButton from '../components/list/CreateListButton';
+import ActivityHistory from '../components/board/ActivityHistory';
 import Navbar from '../components/common/Navbar';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +23,7 @@ export default function BoardPage() {
     const navigate = useNavigate();
     const { currentBoard, isLoading, error, fetchBoard, moveTask, clearCurrentBoard } = useBoardStore();
     const { user } = useAuth();
+    const [showActivity, setShowActivity] = useState(false);
     useSocket(id);
 
     const sensors = useSensors(
@@ -115,7 +117,11 @@ export default function BoardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex-1 flex flex-col relative z-10"
             >
-                <BoardHeader board={currentBoard} currentUser={user!} />
+                <BoardHeader
+                    board={currentBoard}
+                    currentUser={user!}
+                    onToggleActivity={() => setShowActivity(!showActivity)}
+                />
 
                 <div className="flex-1 min-h-0 overflow-x-auto overflow-y-hidden no-scrollbar">
                     <DndContext
@@ -159,6 +165,12 @@ export default function BoardPage() {
                     </DndContext>
                 </div>
             </motion.div>
+
+            <ActivityHistory
+                boardId={currentBoard.id}
+                isOpen={showActivity}
+                onClose={() => setShowActivity(false)}
+            />
         </div>
     );
 }
