@@ -37,6 +37,16 @@ export const authMiddleware = async (
         next();
     } catch (error) {
         console.error('Auth Middleware Error:', error);
+
+        // Distinguish between auth errors and DB/Runtime errors
+        if ((error as any).code?.startsWith('P') || (error as any).message?.includes('Prisma')) {
+            res.status(500).json({
+                error: 'Database connection error',
+                details: 'The server is unable to reach the database. Please check connectivity.'
+            });
+            return;
+        }
+
         res.status(401).json({ error: 'Invalid or expired token', details: (error as any).message });
     }
 };
