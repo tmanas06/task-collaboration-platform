@@ -103,6 +103,9 @@ export const tasksApi = {
     create: (data: { title: string; description?: string; listId: string; dueDate?: string }) =>
         api.post<ApiResponse<Task>>('/tasks', data).then((r) => r.data.data),
 
+    getById: (id: string) =>
+        api.get<ApiResponse<Task>>(`/tasks/${id}`).then((r) => r.data.data),
+
     update: (id: string, data: { title?: string; description?: string; dueDate?: string | null }) =>
         api.put<ApiResponse<Task>>(`/tasks/${id}`, data).then((r) => r.data.data),
 

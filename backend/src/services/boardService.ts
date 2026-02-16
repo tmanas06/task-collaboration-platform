@@ -31,7 +31,14 @@ export const boardService = {
                 lists: {
                     include: {
                         tasks: {
-                            include: {
+                            select: {
+                                id: true,
+                                title: true,
+                                position: true,
+                                listId: true,
+                                dueDate: true,
+                                createdAt: true,
+                                updatedAt: true,
                                 assignees: {
                                     include: {
                                         user: {
@@ -131,7 +138,14 @@ export const boardService = {
                 lists: {
                     include: {
                         tasks: {
-                            include: {
+                            select: {
+                                id: true,
+                                title: true,
+                                position: true,
+                                listId: true,
+                                dueDate: true,
+                                createdAt: true,
+                                updatedAt: true,
                                 assignees: {
                                     include: {
                                         user: {
@@ -178,7 +192,14 @@ export const boardService = {
                 lists: {
                     include: {
                         tasks: {
-                            include: {
+                            select: {
+                                id: true,
+                                title: true,
+                                position: true,
+                                listId: true,
+                                dueDate: true,
+                                createdAt: true,
+                                updatedAt: true,
                                 assignees: {
                                     include: {
                                         user: {

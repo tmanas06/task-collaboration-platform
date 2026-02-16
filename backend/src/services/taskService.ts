@@ -321,4 +321,17 @@ export const taskService = {
 
         return { ...updatedTask, boardId };
     },
+
+    async getById(taskId: string, userId: string) {
+        const task = await prisma.task.findUnique({
+            where: { id: taskId },
+            include: taskInclude,
+        });
+
+        if (!task) throw new AppError('Task not found', 404);
+
+        await boardService.verifyMembership(task.list.boardId, userId);
+
+        return { ...task, boardId: task.list.boardId };
+    },
 };

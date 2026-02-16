@@ -64,4 +64,13 @@ export const taskController = {
             next(error);
         }
     },
+
+    async getById(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const task = await taskService.getById(req.params.id as string, req.user!.userId);
+            res.json({ data: task });
+        } catch (error) {
+            next(error);
+        }
+    },
 };

@@ -31,6 +31,7 @@ interface BoardState {
     deleteTask: (id: string) => Promise<void>;
     assignTask: (taskId: string, userId: string) => Promise<void>;
     unassignTask: (taskId: string, userId: string) => Promise<void>;
+    fetchTask: (taskId: string) => Promise<Task>;
 
     // Real-time event handlers
     handleTaskCreated: (task: Task & { boardId: string }) => void;
@@ -344,6 +345,28 @@ export const useBoardStore = create<BoardState>((set, get) => ({
             });
         } catch (error: any) {
             set({ error: error.response?.data?.error || 'Failed to unassign task' });
+        }
+    },
+
+    fetchTask: async (taskId: string) => {
+        try {
+            const task = await tasksApi.getById(taskId);
+            set((state) => {
+                if (!state.currentBoard) return state;
+                return {
+                    currentBoard: {
+                        ...state.currentBoard,
+                        lists: state.currentBoard.lists.map((l) => ({
+                            ...l,
+                            tasks: l.tasks.map((t) => (t.id === taskId ? { ...t, ...task } : t)),
+                        })),
+                    },
+                };
+            });
+            return task;
+        } catch (error: any) {
+            set({ error: error.response?.data?.error || 'Failed to fetch task' });
+            throw error;
         }
     },
 

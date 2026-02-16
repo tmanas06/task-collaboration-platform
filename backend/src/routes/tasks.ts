@@ -14,6 +14,7 @@ const router = Router();
 router.use(authMiddleware);
 
 router.post('/', validate(createTaskSchema), taskController.create);
+router.get('/:id', taskController.getById);
 router.put('/:id', validate(updateTaskSchema), taskController.update);
 router.put('/:id/move', validate(moveTaskSchema), taskController.move);
 router.delete('/:id', taskController.delete);

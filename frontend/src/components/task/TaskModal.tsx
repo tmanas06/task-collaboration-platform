@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Task, BoardMember } from '../../types';
 import { useBoardStore } from '../../store/boardStore';
 
@@ -15,7 +15,27 @@ export default function TaskModal({ task, boardMembers, onClose }: Props) {
         task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''
     );
     const [isSaving, setIsSaving] = useState(false);
-    const { updateTask, deleteTask, assignTask, unassignTask } = useBoardStore();
+    const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+    const { updateTask, deleteTask, assignTask, unassignTask, fetchTask } = useBoardStore();
+
+    useEffect(() => {
+        const loadDetails = async () => {
+            setIsLoadingDetails(true);
+            try {
+                const fullTask = await fetchTask(task.id);
+                setTitle(fullTask.title);
+                setDescription(fullTask.description || '');
+                if (fullTask.dueDate) {
+                    setDueDate(new Date(fullTask.dueDate).toISOString().split('T')[0]);
+                }
+            } catch (error) {
+                console.error('Failed to load task details:', error);
+            } finally {
+                setIsLoadingDetails(false);
+            }
+        };
+        loadDetails();
+    }, [task.id, fetchTask]);
 
     const handleSave = async () => {
         setIsSaving(true);
@@ -81,13 +101,19 @@ export default function TaskModal({ task, boardMembers, onClose }: Props) {
                     {/* Description */}
                     <div>
                         <label className="block text-sm font-medium text-muted-foreground mb-1.5">Description</label>
-                        <textarea
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-accent-color focus:border-transparent outline-none transition-all resize-none"
-                            rows={4}
-                            placeholder="Add a description..."
-                        />
+                        {isLoadingDetails ? (
+                            <div className="w-full h-32 bg-muted/10 animate-pulse rounded-xl flex items-center justify-center">
+                                <span className="text-xs text-muted-foreground">Loading details...</span>
+                            </div>
+                        ) : (
+                            <textarea
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-accent-color focus:border-transparent outline-none transition-all resize-none"
+                                rows={4}
+                                placeholder="Add a description..."
+                            />
+                        )}
                     </div>
 
                     {/* Due date */}

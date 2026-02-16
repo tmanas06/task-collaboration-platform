@@ -67,6 +67,7 @@ model List {
 
   @@index([boardId])
   @@index([position])
+  @@index([boardId, position])
 }
 
 model Task {
@@ -83,6 +84,7 @@ model Task {
 
   @@index([listId])
   @@index([position])
+  @@index([listId, position])
 }
 
 model TaskAssignee {
