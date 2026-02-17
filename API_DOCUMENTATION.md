@@ -2,199 +2,117 @@
 
 Base URL: `http://localhost:3001/api`
 
-All authenticated endpoints require: `Authorization: Bearer <token>`
+All authenticated endpoints require: `Authorization: Bearer <Firebase_ID_Token>`
 
 ## Authentication
 
-### POST /auth/signup
-Create a new user account.
+Authentication is managed via Firebase. The local backend uses the `/auth/sync` endpoint to link Firebase users with the local database.
+
+### POST /auth/sync
+Synchronize a Firebase authenticated user with the local application database. Should be called after every successful Firebase login/signup on the frontend.
+
+**Headers:**
+`Authorization: Bearer <Firebase_ID_Token>`
 
 **Request:**
 ```json
-{ "email": "user@example.com", "password": "password123", "name": "John Doe" }
+{
+  "name": "Full Name",
+  "photoURL": "https://example.com/avatar.jpg"
+}
 ```
 
-**Response (201):**
+**Response (200):**
 ```json
 {
   "data": {
-    "user": { "id": "uuid", "email": "user@example.com", "name": "John Doe", "avatar": null, "createdAt": "2024-01-01T00:00:00Z" },
-    "token": "jwt-token-here"
+    "id": "uuid",
+    "email": "user@example.com",
+    "name": "Full Name",
+    "avatar": "...",
+    "createdAt": "..."
   }
 }
 ```
 
-### POST /auth/login
-Authenticate an existing user.
-
-**Request:**
-```json
-{ "email": "user@example.com", "password": "password123" }
-```
-
-**Response (200):** Same format as signup.
-
 ### GET /auth/me
-Get the currently authenticated user. Requires auth header.
-
-**Response (200):**
-```json
-{ "data": { "id": "uuid", "email": "user@example.com", "name": "John Doe", "avatar": null, "createdAt": "..." } }
-```
+Get the profile for the currently logged-in user.
 
 ---
 
 ## Boards
 
 ### GET /boards
-List all boards the user is a member of.
-
-**Query params:** `page` (default 1), `limit` (default 10), `search` (optional)
-
-**Response (200):**
-```json
-{
-  "data": [{ "id": "uuid", "title": "My Board", "description": "...", "createdBy": {...}, "members": [...], "_count": { "lists": 3 } }],
-  "pagination": { "page": 1, "limit": 10, "total": 25, "totalPages": 3 }
-}
-```
+List all boards for the current user. Supports `page`, `limit`, and `search`.
 
 ### POST /boards
-Create a new board. Creator is automatically added as ADMIN.
-
-**Request:**
-```json
-{ "title": "New Board", "description": "Optional description" }
-```
+Create a new board.
 
 ### GET /boards/:id
-Get a single board with all lists, tasks, and members.
-
-### PUT /boards/:id
-Update board title/description. **Requires ADMIN role.**
-
-### DELETE /boards/:id
-Delete a board and all related data. **Requires ADMIN role.**
-
-### POST /boards/:id/members
-Add a member by email. **Requires ADMIN role.**
-
-**Request:**
-```json
-{ "email": "member@example.com", "role": "MEMBER" }
-```
-
-### DELETE /boards/:id/members/:userId
-Remove a member. **Requires ADMIN role.** Cannot remove yourself.
+Get a full board including all lists, tasks, and members.
 
 ### GET /boards/:id/activities
-Get paginated activity log for the board.
+Get the activity history for a board.
 
-**Query params:** `page` (default 1), `limit` (default 20)
+**Response Metadata (Example):**
+Activity objects include `metadata` specific to the action:
+- `TASK_ASSIGNED`: `{ "title": "Task A", "assignedUserName": "John" }`
+- `LIST_UPDATED`: `{ "title": "In Progress" }`
+- `MEMBER_ADDED`: `{ "memberName": "Jane" }`
 
 ---
 
 ## Lists
 
 ### POST /lists
-Create a new list in a board. Position is auto-assigned.
-
-**Request:**
-```json
-{ "title": "To Do", "boardId": "board-uuid" }
-```
+Add a new list to a board.
 
 ### PUT /lists/:id
-Update list title or position.
-
-**Request:**
-```json
-{ "title": "New Title" }
-```
+Rename a list or update its position.
 
 ### DELETE /lists/:id
-Delete a list and all its tasks. Positions of remaining lists are recalculated.
+Remove a list.
 
 ---
 
 ## Tasks
 
 ### POST /tasks
-Create a new task. Position is auto-assigned.
-
-**Request:**
-```json
-{ "title": "Fix bug", "listId": "list-uuid", "description": "Optional", "dueDate": "2024-12-31T00:00:00Z" }
-```
+Create a new task.
 
 ### PUT /tasks/:id
-Update task title, description, or due date.
-
-**Request:**
-```json
-{ "title": "Updated title", "description": "New desc", "dueDate": null }
-```
+Update title, description, or due date.
 
 ### PUT /tasks/:id/move
-Move a task to a different list and/or position. Uses database transactions for atomic position updates.
-
-**Request:**
-```json
-{ "listId": "target-list-uuid", "position": 2 }
-```
-
-### DELETE /tasks/:id
-Delete a task. Positions of remaining tasks in the list are recalculated.
+Move a task to a different list or change its position.
 
 ### POST /tasks/:id/assign
 Assign a board member to a task.
-
-**Request:**
-```json
-{ "userId": "user-uuid" }
-```
+**Body:** `{ "userId": "member-uuid" }`
 
 ### DELETE /tasks/:id/assign/:userId
-Remove a user from a task.
+Unassign a user from a task.
 
 ---
 
-## WebSocket Events
+## WebSocket Events (Socket.IO)
 
-Connect to `http://localhost:3001` with `auth: { token }`.
+Connect to the server and listen for real-time updates.
 
-### Client → Server
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `join-board` | `boardId: string` | Join board room for real-time updates |
-| `leave-board` | `boardId: string` | Leave board room |
-
-### Server → Client
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `task-created` | Task object with boardId | New task created |
-| `task-updated` | Task object with boardId | Task was updated |
-| `task-moved` | Task object with boardId | Task moved to different list/position |
-| `task-deleted` | `{ boardId, listId, taskId }` | Task was deleted |
-| `list-created` | List object | New list created |
-| `list-updated` | List object | List was updated |
-| `list-deleted` | `{ boardId, listId }` | List was deleted |
-| `member-added` | Member object | New member added to board |
+| Event | Payload |
+|-------|---------|
+| `task:created` | Full task object |
+| `task:updated` | Full task object (includes `assignees`) |
+| `task:moved` | Full task object (with new `listId`) |
+| `task:deleted` | `{ "taskId": "..." }` |
+| `activity:created` | Activity object |
 
 ---
 
-## Error Responses
+## Error Handling
 
-All errors follow this format:
-```json
-{ "error": "Error message" }
-```
-
-| Status | Meaning |
-|--------|---------|
-| 400 | Validation error |
-| 401 | Not authenticated / invalid token |
-| 403 | Not authorized (wrong role) |
-| 404 | Resource not found |
-| 409 | Conflict (duplicate) |
-| 500 | Server error |
+Standard HTTP status codes are used:
+- `401 Unauthorized`: Missing or invalid Firebase token.
+- `403 Forbidden`: User is not a member of the board.
+- `404 Not Found`: Resource does not exist.
+- `400 Bad Request`: Validation error (Zod).
