@@ -36,4 +36,4 @@ yarn-error.log*
 
 # Prisma
 .prisma/
-/backend/prisma/migrations/
+# /backend/prisma/migrations/
