@@ -220,7 +220,7 @@ export const boardService = {
             action: 'BOARD_UPDATED',
             entityType: 'Board',
             entityId: boardId,
-            metadata: input,
+            metadata: { ...input, title: board.title },
             userId,
             boardId,
         });
@@ -272,7 +272,7 @@ export const boardService = {
             action: 'MEMBER_ADDED',
             entityType: 'BoardMember',
             entityId: member.id,
-            metadata: { memberName: userToAdd.name, memberEmail: userToAdd.email },
+            metadata: { memberName: userToAdd.name, memberEmail: userToAdd.email, memberUserId: userToAdd.id },
             userId,
             boardId,
         });

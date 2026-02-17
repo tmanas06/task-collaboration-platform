@@ -6,6 +6,7 @@ import Signup from './components/auth/Signup';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import BoardPage from './pages/BoardPage';
+import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -40,6 +41,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <BoardPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
                         </ProtectedRoute>
                     }
                 />

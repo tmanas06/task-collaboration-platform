@@ -88,7 +88,7 @@ export const listService = {
             action: 'LIST_UPDATED',
             entityType: 'List',
             entityId: listId,
-            metadata: input,
+            metadata: { ...input, title: updated.title },
             userId,
             boardId: list.boardId,
         });

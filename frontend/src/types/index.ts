@@ -3,6 +3,7 @@ export interface User {
     email: string;
     name: string;
     avatar?: string | null;
+    description?: string | null;
     createdAt: string;
 }
 
@@ -90,4 +91,15 @@ export interface AuthResponse {
 
 export interface ApiResponse<T> {
     data: T;
+}
+
+export interface Notification {
+    id: string;
+    userId: string;
+    title: string;
+    message: string;
+    type: string;
+    read: boolean;
+    link?: string | null;
+    createdAt: string;
 }

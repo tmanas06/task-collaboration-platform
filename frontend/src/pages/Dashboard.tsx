@@ -182,10 +182,14 @@ export default function Dashboard() {
                                                 {board.members.slice(0, 3).map((m) => (
                                                     <div
                                                         key={m.id}
-                                                        className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[10px] font-black text-foreground"
+                                                        className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[10px] font-black text-foreground overflow-hidden"
                                                         title={m.user.name}
                                                     >
-                                                        {m.user.name.charAt(0).toUpperCase()}
+                                                        {m.user.avatar ? (
+                                                            <img src={m.user.avatar} alt={m.user.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            m.user.name.charAt(0).toUpperCase()
+                                                        )}
                                                     </div>
                                                 ))}
                                                 {board.members.length > 3 && (

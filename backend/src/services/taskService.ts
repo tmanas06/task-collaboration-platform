@@ -86,7 +86,7 @@ export const taskService = {
             action: 'TASK_UPDATED',
             entityType: 'Task',
             entityId: taskId,
-            metadata: input,
+            metadata: { ...input, title: updated.title },
             userId,
             boardId: task.list.boardId,
         });
@@ -274,7 +274,7 @@ export const taskService = {
             action: 'TASK_ASSIGNED',
             entityType: 'Task',
             entityId: taskId,
-            metadata: { title: task.title, assignedUser: assignedUser?.name },
+            metadata: { title: task.title, assignedUser: assignedUser?.name, assignedUserId: assignUserId },
             userId,
             boardId,
         });

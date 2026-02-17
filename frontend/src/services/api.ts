@@ -125,6 +125,27 @@ export const tasksApi = {
 export const usersApi = {
     search: (q: string) =>
         api.get<ApiResponse<User[]>>('/users/search', { params: { q } }).then((r) => r.data.data),
+
+    getProfile: () =>
+        api.get<ApiResponse<User>>('/users/me').then((r) => r.data.data),
+
+    updateProfile: (data: { name?: string; avatar?: string; description?: string }) =>
+        api.put<ApiResponse<User>>('/users/me', data).then((r) => r.data.data),
+};
+
+// Notifications
+export const notificationsApi = {
+    getAll: () =>
+        api.get<ApiResponse<Notification[]>>('/notifications').then((r) => r.data.data),
+
+    markAsRead: (id: string) =>
+        api.put(`/notifications/${id}/read`).then((r) => r.data),
+
+    markAllAsRead: () =>
+        api.put('/notifications/read-all').then((r) => r.data),
+
+    delete: (id: string) =>
+        api.delete(`/notifications/${id}`).then((r) => r.data),
 };
 
 export default api;

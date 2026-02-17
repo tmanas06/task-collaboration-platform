@@ -15,12 +15,14 @@ model User {
   password      String?
   name          String
   avatar        String?
+  description   String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   activities    Activity[]
   createdBoards Board[]
   boards        BoardMember[]
   assignedTasks TaskAssignee[]
+  notifications Notification[]
 
   @@index([email])
 }
@@ -137,4 +139,19 @@ enum ActionType {
   TASK_UNASSIGNED
   MEMBER_ADDED
   MEMBER_REMOVED
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }

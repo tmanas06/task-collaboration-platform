@@ -66,8 +66,6 @@ export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
                 return <>{userName} updated board settings</>;
             case 'LIST_CREATED':
                 return <>{userName} created list <span className="font-bold">"{metadata.title}"</span></>;
-            case 'LIST_DELETED':
-                return <>{userName} deleted a list</>;
             case 'TASK_CREATED':
                 return <>{userName} added task <span className="font-bold">"{metadata.title}"</span> to <span className="font-bold">"{metadata.listTitle}"</span></>;
             case 'TASK_MOVED':
@@ -76,10 +74,14 @@ export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
                 );
             case 'TASK_UPDATED':
                 return <>{userName} updated task <span className="font-bold">"{metadata.title}"</span></>;
-            case 'TASK_ASSIGNED':
-                return <>{userName} assigned <span className="font-bold">{metadata.assignedUser}</span> to <span className="font-bold">"{metadata.title}"</span></>;
-            case 'MEMBER_ADDED':
-                return <>{userName} invited <span className="font-bold">{metadata.memberName}</span> to the board</>;
+            case 'TASK_UNASSIGNED':
+                return <>{userName} removed an assignee from <span className="font-bold">"{metadata.title}"</span></>;
+            case 'LIST_UPDATED':
+                return <>{userName} renamed list to <span className="font-bold">"{metadata.title}"</span></>;
+            case 'LIST_DELETED':
+                return <>{userName} deleted list <span className="font-bold">"{metadata.title}"</span></>;
+            case 'MEMBER_REMOVED':
+                return <>{userName} removed <span className="font-bold">{metadata.memberName}</span> from the board</>;
             default:
                 return <>{userName} performed an action</>;
         }

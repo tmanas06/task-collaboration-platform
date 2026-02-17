@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useThemeStore, AccentColor } from '../../store/themeStore';
-import { LogOut, Layout, User as UserIcon, Activity, ChevronDown, Bell, Palette, Sun, Moon, Check } from 'lucide-react';
+import { LogOut, Layout, User as UserIcon, Activity, ChevronDown, Bell, Palette, Sun, Moon, Check, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import NotificationDropdown from './NotificationDropdown';
 
 const ACCENT_COLORS: { name: AccentColor, color: string }[] = [
     { name: 'indigo', color: '#6366f1' },
@@ -136,6 +137,9 @@ export default function Navbar() {
                             </AnimatePresence>
                         </div>
 
+                        {/* Notifications */}
+                        <NotificationDropdown />
+
                         {/* User Profile */}
                         <div className="flex items-center gap-4 pl-4 border-l border-white/10 relative" ref={userMenuRef}>
                             <div
@@ -163,14 +167,14 @@ export default function Navbar() {
                                         <div className="px-3 py-2 border-b border-white/5 mb-1">
                                             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Account</p>
                                         </div>
-                                        <button className="w-full flex items-center gap-3 px-3 py-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-xs font-medium group">
+                                        <Link
+                                            to="/profile"
+                                            className="w-full flex items-center gap-3 px-3 py-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-xs font-medium group"
+                                            onClick={() => setShowUserMenu(false)}
+                                        >
                                             <UserIcon className="w-4 h-4 text-zinc-600 group-hover:text-accent-color transition-colors" />
                                             Profile Settings
-                                        </button>
-                                        <button className="w-full flex items-center gap-3 px-3 py-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-xs font-medium group">
-                                            <Bell className="w-4 h-4 text-zinc-600 group-hover:text-accent-color transition-colors" />
-                                            Notifications
-                                        </button>
+                                        </Link>
                                         <button
                                             onClick={handleLogout}
                                             className="w-full flex items-center gap-3 px-3 py-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all text-xs font-bold mt-1 group"

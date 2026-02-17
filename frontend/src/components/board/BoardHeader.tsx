@@ -152,9 +152,13 @@ export default function BoardHeader({ board, currentUser, onToggleActivity }: Pr
                                 {board.members.slice(0, 3).map((m) => (
                                     <div
                                         key={m.id}
-                                        className="w-8 h-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-[10px] font-black text-foreground group-hover:border-accent-color/30 transition-colors"
+                                        className="w-8 h-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-[10px] font-black text-foreground group-hover:border-accent-color/30 transition-colors overflow-hidden"
                                     >
-                                        {m.user.name.charAt(0).toUpperCase()}
+                                        {m.user.avatar ? (
+                                            <img src={m.user.avatar} alt={m.user.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            m.user.name.charAt(0).toUpperCase()
+                                        )}
                                     </div>
                                 ))}
                                 {board.members.length > 3 && (
@@ -250,8 +254,12 @@ export default function BoardHeader({ board, currentUser, onToggleActivity }: Pr
                                                 <div key={m.id} className="flex items-center justify-between p-2 hover:bg-muted/10 rounded-2xl group/member transition-colors">
                                                     <div className="flex items-center gap-3">
                                                         <div className="relative">
-                                                            <div className="w-10 h-10 bg-background border border-border rounded-xl flex items-center justify-center text-xs font-black text-foreground">
-                                                                {m.user.name.charAt(0).toUpperCase()}
+                                                            <div className="w-10 h-10 bg-background border border-border rounded-xl flex items-center justify-center text-xs font-black text-foreground overflow-hidden">
+                                                                {m.user.avatar ? (
+                                                                    <img src={m.user.avatar} alt={m.user.name} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    m.user.name.charAt(0).toUpperCase()
+                                                                )}
                                                             </div>
                                                             {m.user.id === currentUser.id && (
                                                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-background rounded-full" />

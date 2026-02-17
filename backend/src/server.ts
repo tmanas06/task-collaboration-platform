@@ -11,6 +11,7 @@ import boardRoutes from './routes/boards';
 import listRoutes from './routes/lists';
 import taskRoutes from './routes/tasks';
 import userRoutes from './routes/users';
+import notificationRoutes from './routes/notification.routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -49,6 +50,7 @@ app.use('/api/boards', boardRoutes);
 app.use('/api/lists', listRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Error handling
 app.use(errorHandler);
