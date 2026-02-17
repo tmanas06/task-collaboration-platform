@@ -10,7 +10,13 @@ interface Props {
     onClose: () => void;
 }
 
-export default function TaskModal({ task, boardMembers, onClose }: Props) {
+export default function TaskModal({ task: initialTask, boardMembers, onClose }: Props) {
+    const task = useBoardStore(state =>
+        state.currentBoard?.lists
+            .flatMap(l => l.tasks)
+            .find(t => t.id === initialTask.id) || initialTask
+    );
+
     const [title, setTitle] = useState(task.title);
     const [description, setDescription] = useState(task.description || '');
     const [dueDate, setDueDate] = useState(
@@ -29,6 +35,7 @@ export default function TaskModal({ task, boardMembers, onClose }: Props) {
             setIsLoadingDetails(true);
             try {
                 const fullTask = await fetchTask(task.id);
+                // Synchronize state with fetched details
                 setTitle(fullTask.title);
                 setDescription(fullTask.description || '');
                 if (fullTask.dueDate) {
@@ -42,6 +49,16 @@ export default function TaskModal({ task, boardMembers, onClose }: Props) {
         };
         loadDetails();
     }, [task.id, fetchTask]);
+
+    // Synchronize local state when task in store updates (e.g. via sockets)
+    useEffect(() => {
+        // Only update if the values are different to avoid unnecessary resets
+        // Note: In a more complex app, we might want to avoid overwriting if the user has unsaved changes
+        setTitle(prev => prev === task.title ? prev : task.title);
+        setDescription(prev => prev === (task.description || '') ? prev : (task.description || ''));
+        const storeDate = task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '';
+        setDueDate(prev => prev === storeDate ? prev : storeDate);
+    }, [task.title, task.description, task.dueDate]);
 
     const handleSave = async () => {
         setIsSaving(true);
