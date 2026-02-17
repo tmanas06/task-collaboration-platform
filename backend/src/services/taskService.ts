@@ -2,6 +2,7 @@ import prisma from '../prisma/client';
 import { AppError } from '../middleware/errorHandler';
 import { activityService } from './activityService';
 import { boardService } from './boardService';
+import { socketService } from './socketService';
 import { CreateTaskInput, UpdateTaskInput, MoveTaskInput } from '../types';
 
 const taskInclude = {
@@ -56,8 +57,10 @@ export const taskService = {
             userId,
             boardId: list.boardId,
         });
+        const newTask = { ...task, boardId: list.boardId };
+        socketService.emitToBoard(list.boardId, 'task:created', newTask);
 
-        return { ...task, boardId: list.boardId };
+        return newTask;
     },
 
     async update(taskId: string, input: UpdateTaskInput, userId: string) {
@@ -91,7 +94,10 @@ export const taskService = {
             boardId: task.list.boardId,
         });
 
-        return { ...updated, boardId: task.list.boardId };
+        const updatedTask = { ...updated, boardId: task.list.boardId };
+        socketService.emitToBoard(task.list.boardId, 'task:updated', updatedTask);
+
+        return updatedTask;
     },
 
     async move(taskId: string, input: MoveTaskInput, userId: string) {
@@ -231,6 +237,12 @@ export const taskService = {
             boardId: task.list.boardId,
         });
 
+        socketService.emitToBoard(task.list.boardId, 'task:deleted', {
+            taskId,
+            listId: task.listId,
+            boardId: task.list.boardId
+        });
+
         return { message: 'Task deleted successfully', boardId: task.list.boardId, listId: task.listId };
     },
 
@@ -274,12 +286,19 @@ export const taskService = {
             action: 'TASK_ASSIGNED',
             entityType: 'Task',
             entityId: taskId,
-            metadata: { title: task.title, assignedUser: assignedUser?.name, assignedUserId: assignUserId },
+            metadata: {
+                title: task.title,
+                assignedUserName: assignedUser?.name,
+                assignedUserId: assignUserId
+            },
             userId,
             boardId,
         });
 
-        return { ...updatedTask, boardId };
+        const assignedTask = { ...updatedTask, boardId };
+        socketService.emitToBoard(boardId, 'task:updated', assignedTask);
+
+        return assignedTask;
     },
 
     async unassign(taskId: string, removeUserId: string, userId: string) {
@@ -310,16 +329,28 @@ export const taskService = {
             include: taskInclude,
         });
 
+        const unassignedUser = await prisma.user.findUnique({
+            where: { id: removeUserId },
+            select: { name: true },
+        });
+
         await activityService.log({
             action: 'TASK_UNASSIGNED',
             entityType: 'Task',
             entityId: taskId,
-            metadata: { title: task.title },
+            metadata: {
+                title: task.title,
+                unassignedUserName: unassignedUser?.name,
+                unassignedUserId: removeUserId
+            },
             userId,
             boardId,
         });
 
-        return { ...updatedTask, boardId };
+        const unassignedTask = { ...updatedTask, boardId };
+        socketService.emitToBoard(boardId, 'task:updated', unassignedTask);
+
+        return unassignedTask;
     },
 
     async getById(taskId: string, userId: string) {

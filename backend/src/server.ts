@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 // restart-trigger
 import { setupSocketHandlers, emitBoardEvent } from './socket/handlers';
+import { socketService } from './services/socketService';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
 import boardRoutes from './routes/boards';
@@ -30,6 +31,9 @@ const io = new Server(httpServer, {
 
 // Setup socket handlers
 setupSocketHandlers(io);
+
+// Initialize socket service
+socketService.initialize(io);
 
 // Make io accessible to routes for emitting events
 app.set('io', io);

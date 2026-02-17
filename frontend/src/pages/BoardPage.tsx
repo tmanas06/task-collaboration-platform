@@ -144,7 +144,7 @@ export default function BoardPage() {
         [currentBoard, moveTask]
     );
 
-    if (isLoading) {
+    if (isLoading && !currentBoard) {
         return (
             <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
                 <Navbar />

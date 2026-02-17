@@ -1,6 +1,7 @@
 import prisma from '../prisma/client';
 import { ActionType } from '@prisma/client';
 import { notificationService } from './notification.service';
+import { socketService } from './socketService';
 
 interface LogActivityInput {
     action: ActionType;
@@ -38,6 +39,9 @@ export const activityService = {
         } catch (error) {
             console.error('Error handling notifications for activity:', error);
         }
+
+        // Emit real-time event
+        socketService.emitToBoard(input.boardId, 'activity:created', activity);
 
         return activity;
     },
@@ -87,6 +91,9 @@ export const activityService = {
                 include: {
                     user: {
                         select: { id: true, name: true, email: true, avatar: true },
+                    },
+                    board: {
+                        select: { title: true },
                     },
                 },
                 orderBy: { createdAt: 'desc' },

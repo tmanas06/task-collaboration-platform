@@ -33,10 +33,13 @@ const ACTION_COLORS: Record<string, string> = {
     TASK_DELETED: 'bg-rose-500/10 text-rose-500',
     TASK_MOVED: 'bg-amber-500/10 text-amber-500',
     MEMBER_ADDED: 'bg-violet-500/10 text-violet-500',
+    MEMBER_REMOVED: 'bg-rose-500/10 text-rose-500',
+    LIST_UPDATED: 'bg-blue-500/10 text-blue-500',
+    LIST_DELETED: 'bg-rose-500/10 text-rose-500',
 };
 
 export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
-    const { activities, activityPagination, isLoading, fetchActivities } = useBoardStore();
+    const { activities, activityPagination, isActivitiesLoading, error, fetchActivities } = useBoardStore();
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -46,7 +49,7 @@ export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
     }, [isOpen, boardId, fetchActivities]);
 
     const handleScroll = () => {
-        if (!scrollRef.current || isLoading || !activityPagination) return;
+        if (!scrollRef.current || isActivitiesLoading || !activityPagination) return;
         const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
         if (scrollHeight - scrollTop <= clientHeight * 1.5) {
             if (activityPagination.page < activityPagination.totalPages) {
@@ -65,25 +68,31 @@ export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
             case 'BOARD_UPDATED':
                 return <>{userName} updated board settings</>;
             case 'LIST_CREATED':
-                return <>{userName} created list <span className="font-bold">"{metadata.title}"</span></>;
+                return <>{userName} created list <span className="font-bold">"{metadata?.title || 'Unknown'}"</span></>;
             case 'TASK_CREATED':
-                return <>{userName} added task <span className="font-bold">"{metadata.title}"</span> to <span className="font-bold">"{metadata.listTitle}"</span></>;
+                return <>{userName} added task <span className="font-bold">"{metadata?.title || 'Unknown'}"</span> to <span className="font-bold">"{metadata?.listTitle || 'Unknown'}"</span></>;
             case 'TASK_MOVED':
                 return (
-                    <>{userName} moved <span className="font-bold">"{metadata.title}"</span> from <span className="font-bold">"{metadata.fromList}"</span> to <span className="font-bold">"{metadata.toList}"</span></>
+                    <>{userName} moved <span className="font-bold">"{metadata?.title || 'Unknown'}"</span> from <span className="font-bold">"{metadata?.fromList || 'Unknown'}"</span> to <span className="font-bold">"{metadata?.toList || 'Unknown'}"</span></>
                 );
             case 'TASK_UPDATED':
-                return <>{userName} updated task <span className="font-bold">"{metadata.title}"</span></>;
+                return <>{userName} updated task <span className="font-bold">"{metadata?.title || 'Unknown'}"</span></>;
+            case 'TASK_DELETED':
+                return <>{userName} deleted task <span className="font-bold">"{metadata?.title || 'Unknown'}"</span></>;
+            case 'TASK_ASSIGNED':
+                return <>{userName} assigned <span className="font-bold">{metadata?.assignedUserName || 'someone'}</span> to <span className="font-bold">"{metadata?.title || 'a task'}"</span></>;
             case 'TASK_UNASSIGNED':
-                return <>{userName} removed an assignee from <span className="font-bold">"{metadata.title}"</span></>;
+                return <>{userName} removed <span className="font-bold">{metadata?.unassignedUserName || 'someone'}</span> from <span className="font-bold">"{metadata?.title || 'a task'}"</span></>;
             case 'LIST_UPDATED':
-                return <>{userName} renamed list to <span className="font-bold">"{metadata.title}"</span></>;
+                return <>{userName} renamed list to <span className="font-bold">"{metadata?.title || 'Unknown'}"</span></>;
             case 'LIST_DELETED':
-                return <>{userName} deleted list <span className="font-bold">"{metadata.title}"</span></>;
+                return <>{userName} deleted list <span className="font-bold">"{metadata?.title || 'Unknown'}"</span></>;
+            case 'MEMBER_ADDED':
+                return <>{userName} added <span className="font-bold">{metadata?.memberName || 'someone'}</span> to the board</>;
             case 'MEMBER_REMOVED':
-                return <>{userName} removed <span className="font-bold">{metadata.memberName}</span> from the board</>;
+                return <>{userName} removed <span className="font-bold">{metadata?.memberName || 'someone'}</span> from the board</>;
             default:
-                return <>{userName} performed an action</>;
+                return <>{userName} performed an action: {action}</>;
         }
     };
 
@@ -132,10 +141,22 @@ export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
                             onScroll={handleScroll}
                             className="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar"
                         >
-                            {activities.length === 0 && !isLoading ? (
+                            {activities.length === 0 && !isActivitiesLoading ? (
                                 <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
                                     <ActivityIcon className="w-12 h-12 mb-4" />
                                     <p className="font-black uppercase tracking-widest text-xs">No activity yet</p>
+                                </div>
+                            ) : error ? (
+                                <div className="flex flex-col items-center justify-center py-20 text-center opacity-80">
+                                    <ActivityIcon className="w-12 h-12 mb-4 text-rose-500" />
+                                    <p className="font-bold text-rose-500 mb-2">Failed to load activity</p>
+                                    <p className="text-xs text-muted-foreground mb-4">{error}</p>
+                                    <button
+                                        onClick={() => fetchActivities(boardId)}
+                                        className="px-4 py-2 bg-foreground text-background rounded-lg text-xs font-black uppercase tracking-widest hover:bg-accent-color hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                                    >
+                                        Try Again
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="relative z-10 space-y-4">
@@ -177,7 +198,7 @@ export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
                                 </div>
                             )}
 
-                            {isLoading && (
+                            {isActivitiesLoading && (
                                 <div className="py-4 flex justify-center">
                                     <LoadingSpinner />
                                 </div>

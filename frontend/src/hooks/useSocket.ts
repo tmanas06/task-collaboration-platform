@@ -16,6 +16,7 @@ export const useSocket = (boardId?: string) => {
         handleListUpdated,
         handleListDeleted,
         handleMemberAdded,
+        handleActivityCreated,
     } = useBoardStore();
     const boardIdRef = useRef(boardId);
 
@@ -37,14 +38,15 @@ export const useSocket = (boardId?: string) => {
 
         // Register socket event listeners
         const events = {
-            'task-created': handleTaskCreated,
-            'task-updated': handleTaskUpdated,
-            'task-moved': handleTaskMoved,
-            'task-deleted': handleTaskDeleted,
-            'list-created': handleListCreated,
-            'list-updated': handleListUpdated,
-            'list-deleted': handleListDeleted,
-            'member-added': handleMemberAdded,
+            'task:created': handleTaskCreated,
+            'task:updated': handleTaskUpdated,
+            'task:moved': handleTaskMoved,
+            'task:deleted': handleTaskDeleted,
+            'list:created': handleListCreated,
+            'list:updated': handleListUpdated,
+            'list:deleted': handleListDeleted,
+            'member:added': handleMemberAdded,
+            'activity:created': handleActivityCreated,
         };
 
         Object.entries(events).forEach(([event, handler]) => {

@@ -2,6 +2,7 @@ import prisma from '../prisma/client';
 import { AppError } from '../middleware/errorHandler';
 import { activityService } from './activityService';
 import { boardService } from './boardService';
+import { socketService } from './socketService';
 import { CreateListInput, UpdateListInput } from '../types';
 
 export const listService = {
@@ -48,6 +49,8 @@ export const listService = {
             boardId: input.boardId,
         });
 
+        socketService.emitToBoard(input.boardId, 'list:created', list);
+
         return list;
     },
 
@@ -93,7 +96,10 @@ export const listService = {
             boardId: list.boardId,
         });
 
-        return updated;
+        const updatedList = { ...updated, boardId: list.boardId };
+        socketService.emitToBoard(list.boardId, 'list:updated', updatedList);
+
+        return updatedList;
     },
 
     async delete(listId: string, userId: string) {
@@ -122,6 +128,11 @@ export const listService = {
             metadata: { title: list.title },
             userId,
             boardId: list.boardId,
+        });
+
+        socketService.emitToBoard(list.boardId, 'list:deleted', {
+            listId,
+            boardId: list.boardId
         });
 
         return { message: 'List deleted successfully', boardId: list.boardId };

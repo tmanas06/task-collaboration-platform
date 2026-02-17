@@ -7,6 +7,7 @@ interface BoardState {
     currentBoard: Board | null;
     pagination: Pagination | null;
     isLoading: boolean;
+    isActivitiesLoading: boolean;
     error: string | null;
     activities: Activity[];
     activityPagination: Pagination | null;
@@ -44,6 +45,7 @@ interface BoardState {
     handleListUpdated: (list: List) => void;
     handleListDeleted: (data: { boardId: string; listId: string }) => void;
     handleMemberAdded: (data: any) => void;
+    handleActivityCreated: (activity: Activity) => void;
 
     clearError: () => void;
     clearCurrentBoard: () => void;
@@ -54,6 +56,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     currentBoard: null,
     pagination: null,
     isLoading: false,
+    isActivitiesLoading: false,
     error: null,
     activities: [],
     activityPagination: null,
@@ -118,16 +121,16 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     },
 
     fetchActivities: async (id: string, page = 1, limit = 20) => {
-        set({ isLoading: true, error: null });
+        set({ isActivitiesLoading: true, error: null });
         try {
             const result = await boardsApi.getActivities(id, page, limit);
             set((state) => ({
                 activities: page === 1 ? result.data : [...state.activities, ...result.data],
                 activityPagination: result.pagination,
-                isLoading: false,
+                isActivitiesLoading: false,
             }));
         } catch (error: any) {
-            set({ error: error.response?.data?.error || 'Failed to fetch activities', isLoading: false });
+            set({ error: error.response?.data?.error || 'Failed to fetch activities', isActivitiesLoading: false });
         }
     },
 
@@ -547,6 +550,12 @@ export const useBoardStore = create<BoardState>((set, get) => ({
         }
     },
 
+    handleActivityCreated: (activity) => {
+        set((state) => ({
+            activities: [activity, ...state.activities],
+        }));
+    },
+
     clearError: () => set({ error: null }),
-    clearCurrentBoard: () => set({ currentBoard: null }),
+    clearCurrentBoard: () => set({ currentBoard: null, activities: [], activityPagination: null }),
 }));
