@@ -102,6 +102,14 @@ docker compose up --build
 - **Socket.IO Rooms**: Scoped updates to specific boards for efficiency.
 - **Prisma Transactions**: Ensures atomic operations when reordering tasks or lists.
 
+## Assumptions & Trade-offs
+- **Firebase Auth**: Assumes an external identity provider is acceptable for security and ease of scaling.
+- **Optimistic UI**: Trade-off between instant feedback and the complexity of rollback logic.
+- **Integer Positions**: Simple implementation for reordering, though batch updates are required for large lists.
+- **Shared Board Rooms**: Clients receive all updates for a board; assumes moderate board activity where broadcast noise is manageable.
+
+*See [ARCHITECTURE.md](./ARCHITECTURE.md) for a deeper dive.*
+
 ## Recent Fixes
 - 🛠 **Activity History**: Fixed missing descriptions and metadata for assignments and member changes.
 - 🛠 **Infinite Loading Loop**: Resolved issue where activity refreshes would unmount the entire board.
