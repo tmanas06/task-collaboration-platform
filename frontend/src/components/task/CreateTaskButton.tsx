@@ -36,9 +36,9 @@ export default function CreateTaskButton({ listId }: Props) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     onClick={() => setIsOpen(true)}
-                    className="w-full py-3 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-accent-color hover:bg-accent-color/5 rounded-xl transition-all flex items-center justify-center gap-2 group"
+                    className="w-full py-4 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground hover:bg-foreground/5 border-2 border-dashed border-transparent hover:border-foreground/20 rounded-xl transition-all flex items-center justify-center gap-2 group"
                 >
-                    <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <Plus className="w-4 h-4 group-hover:scale-125 transition-transform" />
                     Add Task
                 </motion.button>
             ) : (
@@ -53,7 +53,7 @@ export default function CreateTaskButton({ listId }: Props) {
                         <textarea
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-sm font-bold text-foreground placeholder-muted-foreground focus:border-accent-color/50 outline-none resize-none shadow-inner transition-colors"
+                            className="w-full px-4 py-3 bg-background border-2 border-foreground/20 focus:border-accent-color rounded-xl text-sm font-bold text-foreground placeholder-muted-foreground/50 outline-none resize-none shadow-sm transition-all focus:shadow-[4px_4px_0px_0px_rgba(var(--accent-rgb),0.2)]"
                             rows={3}
                             placeholder="Enter task title..."
                             autoFocus
@@ -65,8 +65,8 @@ export default function CreateTaskButton({ listId }: Props) {
                                 if (e.key === 'Escape') setIsOpen(false);
                             }}
                         />
-                        <div className="absolute bottom-3 right-3 flex items-center gap-1 opacity-20">
-                            <span className="text-[10px] font-bold text-muted-foreground">Return</span>
+                        <div className="absolute bottom-3 right-3 flex items-center gap-1 opacity-40 pointer-events-none">
+                            <span className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Return</span>
                             <CornerDownLeft className="w-3 h-3 text-muted-foreground" />
                         </div>
                     </div>
@@ -74,14 +74,14 @@ export default function CreateTaskButton({ listId }: Props) {
                         <button
                             type="submit"
                             disabled={isLoading || !title.trim()}
-                            className="flex-1 py-2 bg-accent-color text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-accent-color/20"
+                            className="flex-1 py-2.5 bg-foreground text-background text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-accent-color hover:text-white disabled:opacity-50 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none"
                         >
                             {isLoading ? '...' : 'Add Task'}
                         </button>
                         <button
                             type="button"
                             onClick={() => { setIsOpen(false); setTitle(''); }}
-                            className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/10 transition-colors"
+                            className="p-2 text-muted-foreground hover:text-rose-500 rounded-lg hover:bg-rose-500/10 transition-colors"
                         >
                             <X className="w-4 h-4" />
                         </button>

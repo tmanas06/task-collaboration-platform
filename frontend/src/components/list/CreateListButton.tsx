@@ -37,44 +37,51 @@ export default function CreateListButton({ boardId }: Props) {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     onClick={() => setIsOpen(true)}
-                    className="w-[320px] h-fit py-5 px-6 bg-muted/5 border-2 border-dashed border-border rounded-2xl text-muted-foreground hover:text-accent-color hover:border-accent-color/30 hover:bg-accent-color/5 transition-all flex items-center justify-center gap-3 group"
+                    className="w-[320px] h-fit py-6 px-6 bg-muted/5 border-4 border-dashed border-foreground/20 rounded-[2rem] text-muted-foreground hover:text-foreground hover:border-foreground hover:bg-muted/10 transition-all flex items-center justify-center gap-3 group"
                 >
-                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                    <span className="font-black uppercase tracking-widest text-xs">Add new column</span>
+                    <div className="w-10 h-10 rounded-xl border-4 border-current flex items-center justify-center group-hover:rotate-90 transition-transform duration-300">
+                        <Plus className="w-6 h-6 stroke-[3]" />
+                    </div>
+                    <span className="font-black uppercase tracking-widest text-sm">Add New List</span>
                 </motion.button>
             ) : (
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="w-[320px] bg-card border border-border rounded-2xl p-5 ring-4 ring-accent-color/5 shadow-2xl transition-colors"
+                    className="w-[320px] bg-card border-4 border-foreground rounded-[2rem] p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden"
                 >
-                    <form onSubmit={handleSubmit}>
+                    {/* Noise Texture */}
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none mix-blend-soft-light" />
+
+                    <form onSubmit={handleSubmit} className="relative z-10">
                         <div className="flex items-center gap-2 mb-4">
-                            <ListPlus className="w-4 h-4 text-accent-color" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">New Column</span>
+                            <div className="w-8 h-8 bg-accent-color rounded-lg border-2 border-foreground flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                                <ListPlus className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-xs font-black uppercase tracking-widest text-foreground">New List</span>
                         </div>
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full px-4 py-3 bg-muted/20 border border-border rounded-xl text-foreground placeholder-muted-foreground focus:border-accent-color/50 outline-none text-sm font-bold transition-all"
-                            placeholder="e.g. In Review, Testing..."
+                            className="w-full px-4 py-3 bg-background border-2 border-foreground rounded-xl text-foreground placeholder-muted-foreground/50 focus:border-accent-color outline-none text-lg font-bold transition-all shadow-sm focus:shadow-[4px_4px_0px_0px_rgba(var(--accent-rgb),0.4)]"
+                            placeholder="List Title..."
                             autoFocus
                             onKeyDown={(e) => e.key === 'Escape' && setIsOpen(false)}
                         />
-                        <div className="flex gap-2 mt-4">
+                        <div className="flex gap-3 mt-4">
                             <button
                                 type="submit"
                                 disabled={isLoading || !title.trim()}
-                                className="flex-1 py-2.5 bg-accent-color text-white text-xs font-black uppercase tracking-widest rounded-xl hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-accent-color/20"
+                                className="flex-1 py-3 bg-foreground text-background text-xs font-black uppercase tracking-widest rounded-xl hover:bg-accent-color hover:text-white disabled:opacity-50 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:-translate-y-0.5"
                             >
-                                {isLoading ? 'Adding...' : 'Create'}
+                                {isLoading ? 'Adding...' : 'Create List'}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => { setIsOpen(false); setTitle(''); }}
-                                className="p-2.5 text-muted-foreground hover:text-foreground rounded-xl hover:bg-muted/10 transition-colors"
+                                className="p-3 text-muted-foreground hover:text-rose-500 rounded-xl border-2 border-transparent hover:border-rose-500 hover:bg-rose-500/10 transition-all"
                             >
                                 <X className="w-5 h-5" />
                             </button>

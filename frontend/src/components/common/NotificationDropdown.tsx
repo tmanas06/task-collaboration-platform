@@ -89,13 +89,11 @@ export default function NotificationDropdown() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2.5 bg-white/5 border border-white/10 rounded-2xl text-zinc-400 hover:text-accent-color hover:bg-white/10 transition-all relative group"
+                className="p-3 bg-muted/10 border border-border rounded-2xl text-muted-foreground hover:text-accent-color hover:bg-muted/20 transition-all relative group shadow-inner"
             >
-                <Bell className="w-4.5 h-4.5 group-hover:rotate-12 transition-transform" />
+                <Bell className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-zinc-950">
-                        {unreadCount}
-                    </span>
+                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-background animate-pulse" />
                 )}
             </motion.button>
 
@@ -105,44 +103,50 @@ export default function NotificationDropdown() {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 top-full mt-2 w-80 bg-zinc-950 border border-white/10 rounded-3xl shadow-2xl p-4 z-50 overflow-hidden"
+                        className="absolute right-0 top-full mt-4 w-96 bg-card border-4 border-foreground rounded-[2.5rem] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(var(--accent-rgb),0.2)] z-50 overflow-hidden"
                     >
-                        <div className="flex items-center justify-between mb-4 px-2">
-                            <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-widest">Notifications</h3>
+                        {/* Noise Texture */}
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-soft-light" />
+
+                        <div className="relative z-10 flex items-center justify-between p-6 pb-4 border-b-4 border-foreground/10">
+                            <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                                <div className="w-2 h-6 bg-accent-color rounded-full" />
+                                Inbox
+                            </h3>
                             {unreadCount > 0 && (
                                 <button
                                     onClick={handleMarkAllAsRead}
-                                    className="text-[10px] text-zinc-500 hover:text-accent-color font-bold uppercase transition-colors"
+                                    className="text-[10px] bg-foreground text-background px-3 py-1.5 rounded-lg hover:bg-accent-color hover:text-white font-black uppercase tracking-wider transition-all"
                                 >
-                                    Mark all as read
+                                    Mark all read
                                 </button>
                             )}
                         </div>
 
-                        <div className="max-h-[400px] overflow-y-auto space-y-2 custom-scrollbar">
+                        <div className="relative z-10 max-h-[400px] overflow-y-auto p-4 space-y-3 custom-scrollbar">
                             {notifications.length === 0 ? (
-                                <div className="py-12 flex flex-col items-center justify-center text-zinc-600 gap-3">
-                                    <Inbox className="w-8 h-8 opacity-20" />
-                                    <p className="text-[10px] font-bold uppercase tracking-widest italic">All caught up!</p>
+                                <div className="py-12 flex flex-col items-center justify-center text-muted-foreground gap-4 opacity-50">
+                                    <Inbox className="w-12 h-12 stroke-[1.5]" />
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]">All caught up!</p>
                                 </div>
                             ) : (
                                 notifications.map((n) => (
                                     <div
                                         key={n.id}
-                                        className={`group relative p-3 rounded-2xl border transition-all cursor-pointer ${n.read
-                                                ? 'bg-transparent border-transparent hover:bg-white/5'
-                                                : 'bg-accent-color/5 border-accent-color/20 hover:bg-accent-color/10'
+                                        className={`group relative p-4 rounded-2xl border-2 transition-all cursor-pointer ${n.read
+                                            ? 'bg-transparent border-foreground/5 hover:border-foreground/20 hover:bg-foreground/5'
+                                            : 'bg-background border-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[-2px] translate-y-[-2px]'
                                             }`}
                                         onClick={() => handleNotificationClick(n)}
                                     >
-                                        <div className="flex flex-col gap-1 pr-8">
-                                            <p className={`text-[11px] font-bold ${n.read ? 'text-zinc-300' : 'text-zinc-100'}`}>
+                                        <div className="flex flex-col gap-2 pr-8">
+                                            <p className={`text-xs font-bold leading-tight ${n.read ? 'text-muted-foreground' : 'text-foreground'}`}>
                                                 {n.title}
                                             </p>
-                                            <p className="text-[10px] text-zinc-500 leading-relaxed font-medium">
+                                            <p className="text-[11px] text-muted-foreground leading-relaxed font-medium">
                                                 {n.message}
                                             </p>
-                                            <p className="text-[9px] text-zinc-600 font-bold uppercase mt-1">
+                                            <p className="text-[9px] text-muted-foreground/60 font-black uppercase tracking-widest mt-1">
                                                 {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                                             </p>
                                         </div>
@@ -153,15 +157,15 @@ export default function NotificationDropdown() {
                                                     e.stopPropagation();
                                                     handleDelete(n.id);
                                                 }}
-                                                className="p-1.5 hover:bg-rose-500/10 hover:text-rose-500 rounded-lg text-zinc-600 transition-all"
+                                                className="p-1.5 hover:bg-rose-500/10 hover:text-rose-500 rounded-lg text-muted-foreground transition-all"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
 
                                         {!n.read && (
-                                            <div className="absolute top-3 right-10">
-                                                <div className="w-1.5 h-1.5 bg-accent-color rounded-full animate-pulse shadow-[0_0_10px_rgba(var(--color-primary-rgb),0.5)]" />
+                                            <div className="absolute top-4 right-4 animate-pulse">
+                                                <div className="w-2 h-2 bg-accent-color rounded-full" />
                                             </div>
                                         )}
                                     </div>

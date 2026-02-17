@@ -40,18 +40,20 @@ export default function TaskCard({ task, onClick }: Props) {
             {...listeners}
             onClick={onClick}
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            className={`group notion-card cursor-grab active:cursor-grabbing border-border bg-card shadow-sm hover:shadow-md transition-all ${isDragging ? 'opacity-30 scale-105 z-50 shadow-2xl' : 'opacity-100'
+            className={`group notion-card cursor-grab active:cursor-grabbing border-2 border-foreground bg-card shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all rounded-xl relative overflow-hidden ${isDragging ? 'opacity-30 scale-105 z-50 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]' : 'opacity-100'
                 }`}
         >
+            {/* Noise Texture */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none mix-blend-soft-light" />
             {/* Priority Indicator */}
-            <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-1.5">
-                    <div className={`w-1.5 h-1.5 rounded-full ${priorityColor} shadow-[0_0_8px_rgba(0,0,0,0.1)]`} />
-                    <span className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground">
+            <div className="flex items-center justify-between mb-3 relative z-10">
+                <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-sm border border-foreground ${priorityColor} shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]`} />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         {task.priority || 'Task'}
                     </span>
                 </div>
-                <ArrowUpRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowUpRight className="w-3.5 h-3.5 text-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
 
             {/* Title */}
@@ -95,14 +97,14 @@ export default function TaskCard({ task, onClick }: Props) {
                         task.assignees.slice(0, 3).map((a) => (
                             <div
                                 key={a.id}
-                                className="w-6 h-6 rounded-lg bg-muted/20 border-[1.5px] border-border flex items-center justify-center text-[8px] font-black text-foreground shadow-sm"
+                                className="w-6 h-6 rounded-lg bg-background border-2 border-foreground flex items-center justify-center text-[9px] font-black text-foreground shadow-sm"
                                 title={a.user.name}
                             >
                                 {a.user.name.charAt(0).toUpperCase()}
                             </div>
                         ))
                     ) : (
-                        <div className="w-6 h-6 rounded-lg bg-muted/10 border border-border flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-lg bg-muted/10 border-2 border-foreground/10 flex items-center justify-center">
                             <Clock className="w-3 h-3 text-muted-foreground/40" />
                         </div>
                     )}

@@ -106,21 +106,22 @@ export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed top-0 right-0 h-full w-full max-w-sm bg-card border-l border-border shadow-2xl z-[70] flex flex-col"
+                        className="fixed top-0 right-0 h-full w-full max-w-sm bg-card border-l-4 border-foreground shadow-[-12px_0px_0px_0px_rgba(0,0,0,1)] dark:shadow-[-12px_0px_0px_0px_rgba(var(--accent-rgb),0.2)] z-[70] flex flex-col"
                     >
-                        <div className="flex items-center justify-between p-6 border-b border-border bg-muted/5">
+                        {/* Noise Texture */}
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-soft-light" />
+                        <div className="relative z-10 flex items-center justify-between p-6 border-b-4 border-foreground bg-accent-color/5">
                             <div>
-                                <h2 className="text-xl font-black uppercase tracking-widest text-foreground flex items-center gap-2">
-                                    <Clock className="w-5 h-5 text-accent-color" />
+                                <h2 className="text-xl font-black uppercase tracking-widest text-foreground flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-accent-color rounded-lg border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                                        <Clock className="w-4 h-4 text-white" />
+                                    </div>
                                     Activity
                                 </h2>
-                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
-                                    Full historical feed
-                                </p>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 hover:bg-muted/20 rounded-xl text-muted-foreground hover:text-foreground transition-all"
+                                className="p-2 hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 rounded-xl transition-all border-2 border-transparent hover:border-rose-500"
                             >
                                 <X className="w-6 h-6" />
                             </button>
@@ -134,47 +135,45 @@ export default function ActivityHistory({ boardId, isOpen, onClose }: Props) {
                             {activities.length === 0 && !isLoading ? (
                                 <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
                                     <ActivityIcon className="w-12 h-12 mb-4" />
-                                    <p className="font-bold uppercase tracking-widest text-xs">No activity yet</p>
+                                    <p className="font-black uppercase tracking-widest text-xs">No activity yet</p>
                                 </div>
                             ) : (
-                                <div className="relative">
-                                    {/* Vertical Line */}
-                                    <div className="absolute left-4 top-2 bottom-2 w-px bg-border" />
+                                <div className="relative z-10 space-y-4">
+                                    {activities.map((activity, idx) => {
+                                        const Icon = ACTION_ICONS[activity.action] || ActivityIcon;
+                                        const colorClass = ACTION_COLORS[activity.action] || 'bg-muted/20 text-muted-foreground';
 
-                                    <div className="space-y-8 relative">
-                                        {activities.map((activity, idx) => {
-                                            const Icon = ACTION_ICONS[activity.action] || ActivityIcon;
-                                            const colorClass = ACTION_COLORS[activity.action] || 'bg-muted/20 text-muted-foreground';
+                                        return (
+                                            <div
+                                                key={activity.id}
+                                                className="group relative p-4 bg-background border-2 border-foreground/10 hover:border-foreground rounded-2xl transition-all hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex gap-4"
+                                            >
+                                                <div className={`relative z-10 w-10 h-10 rounded-xl border-2 border-foreground/10 group-hover:border-foreground/20 flex items-center justify-center shadow-sm group-hover:scale-110 transition-all ${colorClass.replace('text-', 'bg-opacity-10 text-')}`}>
+                                                    <Icon className="w-5 h-5" />
+                                                </div>
 
-                                            return (
-                                                <div key={activity.id} className="flex gap-4 group">
-                                                    <div className={`relative z-10 w-8 h-8 rounded-full ${colorClass} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                                                        <Icon className="w-4 h-4" />
-                                                    </div>
-
-                                                    <div className="flex-1 pt-1">
-                                                        <p className="text-sm text-muted-foreground leading-relaxed">
-                                                            {renderActivityDescription(activity)}
-                                                        </p>
-                                                        <div className="flex items-center gap-2 mt-2 opacity-60">
-                                                            <div className="w-4 h-4 rounded-full overflow-hidden bg-muted">
-                                                                {activity.user.avatar ? (
-                                                                    <img src={activity.user.avatar} className="w-full h-full object-cover" />
-                                                                ) : (
-                                                                    <div className="w-full h-full flex items-center justify-center text-[6px] font-black uppercase">
-                                                                        {activity.user.name.charAt(0)}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                            <span className="text-[10px] font-bold uppercase tracking-widest">
-                                                                {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
-                                                            </span>
+                                                <div className="flex-1 pt-1">
+                                                    <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                                                        {renderActivityDescription(activity)}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-3 opacity-60">
+                                                        <div className="w-5 h-5 rounded-lg border border-foreground/20 overflow-hidden bg-muted">
+                                                            {activity.user.avatar ? (
+                                                                <img src={activity.user.avatar} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-[8px] font-black uppercase">
+                                                                    {activity.user.name.charAt(0)}
+                                                                </div>
+                                                            )}
                                                         </div>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground/50">
+                                                            {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
 
