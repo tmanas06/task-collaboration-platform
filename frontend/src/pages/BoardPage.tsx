@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     DndContext,
     DragEndEvent,
+    DragOverEvent,
+    DragStartEvent,
+    DragOverlay,
     PointerSensor,
     useSensor,
     useSensors,
@@ -13,6 +16,7 @@ import { useSocket } from '../hooks/useSocket';
 import { useAuth } from '../hooks/useAuth';
 import BoardHeader from '../components/board/BoardHeader';
 import ListColumn from '../components/list/ListColumn';
+import TaskCard from '../components/task/TaskCard';
 import CreateListButton from '../components/list/CreateListButton';
 import ActivityHistory from '../components/board/ActivityHistory';
 import Navbar from '../components/common/Navbar';
@@ -32,6 +36,7 @@ export default function BoardPage() {
 
     const { user } = useAuth();
     const [showActivity, setShowActivity] = useState(false);
+    const [activeTask, setActiveTask] = useState<any>(null);
     useSocket(id);
 
     const sensors = useSensors(
@@ -47,9 +52,64 @@ export default function BoardPage() {
         };
     }, [id]); // Only re-run if ID changes
 
+    const handleDragStart = (event: DragStartEvent) => {
+        const { active } = event;
+        setActiveTask(active.data.current?.task);
+    };
+
+    const handleDragOver = useCallback(
+        (event: DragOverEvent) => {
+            const { active, over } = event;
+            if (!over || !currentBoard) return;
+
+            const activeId = active.id as string;
+            const overId = over.id as string;
+
+            if (activeId === overId) return;
+
+            const activeTask = active.data.current?.task;
+            if (!activeTask) return;
+
+            const overType = over.data.current?.type;
+            const overTask = over.data.current?.task;
+
+            // Find the lists
+            const activeListId = activeTask.listId;
+            const overListId = overType === 'list' ? over.data.current?.listId : overTask?.listId;
+
+            if (!overListId || activeListId === overListId || !event.over) return;
+
+            // If we are dragging over a different list, we need to move the task locally 
+            // to that list so SortableContext can handle the rest
+            const overList = currentBoard.lists.find(l => l.id === overListId);
+            if (!overList) return;
+
+            // Calculate new position in the destination list
+            let newPos = 0;
+            if (overTask && event.over.rect) {
+                const overIndex = overList.tasks.findIndex(t => t.id === overId);
+                const isBelowOverItem =
+                    event.active.rect.current.translated &&
+                    event.active.rect.current.translated.top >
+                    event.over.rect.top + event.over.rect.height;
+
+                const modifier = isBelowOverItem ? 1 : 0;
+                newPos = overIndex >= 0 ? overIndex + modifier : overList.tasks.length;
+            } else {
+                newPos = overList.tasks.length;
+            }
+
+            // Trigger optimistic move in store (this will update currentBoard)
+            moveTask(activeId, overListId, newPos);
+        },
+        [currentBoard, moveTask]
+    );
+
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
             const { active, over } = event;
+            setActiveTask(null);
+
             if (!over || !currentBoard) return;
 
             const taskId = active.id as string;
@@ -128,6 +188,8 @@ export default function BoardPage() {
                     <DndContext
                         sensors={sensors}
                         collisionDetection={closestCorners}
+                        onDragStart={handleDragStart}
+                        onDragOver={handleDragOver}
                         onDragEnd={handleDragEnd}
                     >
                         <motion.div
@@ -163,6 +225,17 @@ export default function BoardPage() {
                                 <CreateListButton boardId={currentBoard.id} />
                             </motion.div>
                         </motion.div>
+
+                        <DragOverlay dropAnimation={null}>
+                            {activeTask ? (
+                                <div className="w-[300px] pointer-events-none transition-transform duration-200">
+                                    <TaskCard
+                                        task={activeTask}
+                                        onClick={() => { }}
+                                    />
+                                </div>
+                            ) : null}
+                        </DragOverlay>
                     </DndContext>
                 </div>
             </motion.div>

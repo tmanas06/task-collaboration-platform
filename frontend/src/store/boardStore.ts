@@ -242,12 +242,14 @@ export const useBoardStore = create<BoardState>((set, get) => ({
             if (!state.currentBoard) return state;
             const board = { ...state.currentBoard };
             let movedTask: Task | null = null;
+            let sourceListId = '';
 
-            // Remove task from source list
+            // 1. Find and remove the task from its source list
             const updatedLists = board.lists.map((list) => {
                 const taskIndex = list.tasks.findIndex((t) => t.id === taskId);
                 if (taskIndex !== -1) {
                     movedTask = { ...list.tasks[taskIndex] };
+                    sourceListId = list.id;
                     return {
                         ...list,
                         tasks: list.tasks.filter((t) => t.id !== taskId),
@@ -258,17 +260,32 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
             if (!movedTask) return state;
 
-            // Add task to destination list at position
+            // 2. Insert the task into the destination list
             const finalLists = updatedLists.map((list) => {
                 if (list.id === toListId) {
                     const tasks = [...list.tasks];
-                    tasks.splice(newPosition, 0, { ...movedTask!, listId: toListId, position: newPosition });
-                    return { ...list, tasks: tasks.map((t, i) => ({ ...t, position: i })) };
+
+                    // If moving within same list and newPosition is relative to original array
+                    // dnd-kit handles this, but we need to be careful with splice
+                    const insertionIndex = Math.min(newPosition, tasks.length);
+                    tasks.splice(insertionIndex, 0, { ...movedTask!, listId: toListId });
+
+                    // Re-calculate all positions in this list to be sure
+                    return {
+                        ...list,
+                        tasks: tasks.map((t, i) => ({ ...t, position: i }))
+                    };
                 }
-                return {
-                    ...list,
-                    tasks: list.tasks.map((t, i) => ({ ...t, position: i })),
-                };
+
+                // For other lists (like source list), also ensure positions are correct
+                if (list.id === sourceListId) {
+                    return {
+                        ...list,
+                        tasks: list.tasks.map((t, i) => ({ ...t, position: i }))
+                    };
+                }
+
+                return list;
             });
 
             return { currentBoard: { ...board, lists: finalLists } };
