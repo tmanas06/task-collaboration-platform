@@ -19,6 +19,7 @@ import ListColumn from '../components/list/ListColumn';
 import TaskCard from '../components/task/TaskCard';
 import CreateListButton from '../components/list/CreateListButton';
 import ActivityHistory from '../components/board/ActivityHistory';
+import TeamModal from '../components/board/TeamModal';
 import Navbar from '../components/common/Navbar';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -35,7 +36,11 @@ export default function BoardPage() {
     const clearCurrentBoard = useBoardStore(state => state.clearCurrentBoard);
 
     const { user } = useAuth();
+    const userRole = currentBoard?.members.find(m => m.userId === user?.id)?.role;
+    const canEdit = userRole !== 'VIEWER';
+
     const [showActivity, setShowActivity] = useState(false);
+    const [showTeamModal, setShowTeamModal] = useState(false);
     const [activeTask, setActiveTask] = useState<any>(null);
     useSocket(id);
 
@@ -182,15 +187,16 @@ export default function BoardPage() {
                     board={currentBoard}
                     currentUser={user!}
                     onToggleActivity={() => setShowActivity(!showActivity)}
+                    onOpenTeamModal={() => setShowTeamModal(true)}
                 />
 
                 <div className="flex-1 min-h-0 overflow-x-auto overflow-y-hidden no-scrollbar">
                     <DndContext
                         sensors={sensors}
                         collisionDetection={closestCorners}
-                        onDragStart={handleDragStart}
-                        onDragOver={handleDragOver}
-                        onDragEnd={handleDragEnd}
+                        onDragStart={canEdit ? handleDragStart : undefined}
+                        onDragOver={canEdit ? handleDragOver : undefined}
+                        onDragEnd={canEdit ? handleDragEnd : undefined}
                     >
                         <motion.div
                             initial={{ x: 50, opacity: 0 }}
@@ -211,19 +217,22 @@ export default function BoardPage() {
                                             <ListColumn
                                                 list={list}
                                                 boardMembers={currentBoard.members}
+                                                currentUser={user}
                                             />
                                         </motion.div>
                                     ))}
                             </AnimatePresence>
 
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.8 }}
-                                className="w-[320px] shrink-0"
-                            >
-                                <CreateListButton boardId={currentBoard.id} />
-                            </motion.div>
+                            {canEdit && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.8 }}
+                                    className="w-[320px] shrink-0"
+                                >
+                                    <CreateListButton boardId={currentBoard.id} />
+                                </motion.div>
+                            )}
                         </motion.div>
 
                         <DragOverlay dropAnimation={null}>
@@ -245,6 +254,16 @@ export default function BoardPage() {
                 isOpen={showActivity}
                 onClose={() => setShowActivity(false)}
             />
+
+            <AnimatePresence>
+                {showTeamModal && (
+                    <TeamModal
+                        board={currentBoard}
+                        currentUser={user!}
+                        onClose={() => setShowTeamModal(false)}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -77,11 +77,12 @@ export const boardsApi = {
         api.post<ApiResponse<BoardMember>>(`/boards/${id}/members`, data).then((r) => r.data.data),
 
     removeMember: (boardId: string, userId: string) =>
-        api.delete(`/boards/${boardId}/members/${userId}`).then((r) => r.data),
-
-    getActivities: (id: string, page = 1, limit = 20) =>
+        api.delete(`/boards/${boardId}/members/${userId}`),
+    updateMemberRole: (boardId: string, userId: string, role: string) =>
+        api.put(`/boards/${boardId}/members/${userId}/role`, { role }),
+    getActivities: (boardId: string, page = 1, limit = 20) =>
         api
-            .get<PaginatedResponse<Activity>>(`/boards/${id}/activities`, {
+            .get<PaginatedResponse<Activity>>(`/boards/${boardId}/activities`, {
                 params: { page, limit },
             })
             .then((r) => r.data),

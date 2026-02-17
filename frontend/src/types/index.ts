@@ -7,11 +7,13 @@ export interface User {
     createdAt: string;
 }
 
+export type Role = 'ADMIN' | 'EDITOR' | 'VIEWER' | 'MEMBER';
+
 export interface BoardMember {
     id: string;
     boardId: string;
     userId: string;
-    role: 'ADMIN' | 'MEMBER';
+    role: Role;
     joinedAt: string;
     user: User;
 }

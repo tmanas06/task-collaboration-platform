@@ -75,6 +75,20 @@ export const boardController = {
         }
     },
 
+    async updateMemberRole(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const member = await boardService.updateMemberRole(
+                req.params.id as string,
+                req.params.userId as string,
+                req.body.role,
+                req.user!.userId
+            );
+            res.json({ data: member });
+        } catch (error) {
+            next(error);
+        }
+    },
+
     async getActivities(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             await boardService.verifyMembership(req.params.id as string, req.user!.userId);

@@ -10,9 +10,10 @@ interface Props {
     board: Board;
     currentUser: User;
     onToggleActivity: () => void;
+    onOpenTeamModal: () => void;
 }
 
-export default function BoardHeader({ board, currentUser, onToggleActivity }: Props) {
+export default function BoardHeader({ board, currentUser, onToggleActivity, onOpenTeamModal }: Props) {
     const [isEditing, setIsEditing] = useState(false);
     const [title, setTitle] = useState(board.title);
     const [showMembers, setShowMembers] = useState(false);
@@ -125,7 +126,7 @@ export default function BoardHeader({ board, currentUser, onToggleActivity }: Pr
                                     <motion.h1
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className={`text - 3xl font - black tracking - tight text - foreground ${isAdmin ? 'cursor-pointer hover:text-accent-color transition-colors' : ''} `}
+                                        className={`text-3xl font-black tracking-tight text-foreground ${isAdmin ? 'cursor-pointer hover:text-accent-color transition-colors' : ''}`}
                                         onClick={() => isAdmin && setIsEditing(true)}
                                     >
                                         {board.title}
@@ -167,42 +168,43 @@ export default function BoardHeader({ board, currentUser, onToggleActivity }: Pr
                                     </div>
                                 )}
                             </div>
-                            <span className="text-sm font-bold text-foreground/80">Share</span>
-                            <ChevronDown className={`w - 4 h - 4 text - muted - foreground transition - transform ${showMembers ? 'rotate-180' : ''} `} />
+                            <span className="text-sm font-bold text-foreground/80">Team</span>
+                            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showMembers ? 'rotate-180' : ''}`} />
                         </motion.button>
 
                         <AnimatePresence>
                             {showMembers && (
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                    className="absolute right-0 mt-4 w-96 bg-card border border-border rounded-3xl shadow-2xl z-50 overflow-hidden transition-colors"
+                                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                    className="absolute right-0 mt-6 w-[400px] bg-card border-4 border-foreground rounded-[2.5rem] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(var(--accent-rgb),0.2)] z-[60] overflow-hidden transition-all"
                                 >
-                                    <div className="p-6">
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div className="flex items-center gap-2">
-                                                <Users className="w-4 h-4 text-accent-color" />
-                                                <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Board Access</h3>
+                                    <div className="p-8 space-y-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat">
+                                        <div className="flex items-center justify-between px-2">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-2 h-6 bg-accent-color rounded-full" />
+                                                <h3 className="text-sm font-black text-foreground uppercase tracking-[0.3em]">Board Squad</h3>
                                             </div>
-                                            <span className="px-2 py-0.5 rounded-lg bg-muted/20 text-[10px] font-black text-muted-foreground uppercase tracking-tighter">
-                                                {board.members.length} Members
+                                            <span className="px-3 py-1 rounded-full bg-foreground text-background text-[10px] font-black uppercase tracking-widest">
+                                                {board.members.length} Users
                                             </span>
                                         </div>
 
                                         {isAdmin && (
-                                            <div className="mb-6">
+                                            <div className="space-y-4">
+                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] px-2 italic opacity-60">Invite new comrade</p>
                                                 <div className="relative group">
-                                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
+                                                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-accent-color transition-colors" />
                                                     <input
                                                         type="text"
                                                         value={memberEmail}
                                                         onChange={(e) => setMemberEmail(e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-muted/20 border border-border rounded-2xl text-sm text-foreground placeholder-muted-foreground outline-none focus:bg-muted/30 focus:border-accent-color transition-all"
-                                                        placeholder="Search users by name or email..."
+                                                        className="w-full pl-14 pr-6 py-5 bg-background border-4 border-foreground rounded-2xl text-sm font-bold text-foreground placeholder-muted-foreground/30 outline-none focus:ring-8 focus:ring-accent-color/10 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] focus:translate-x-1 focus:translate-y-1 focus:shadow-none"
+                                                        placeholder="Search to invite..."
                                                     />
                                                     {isSearching && (
-                                                        <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-accent-color animate-spin" />
+                                                        <Loader2 className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-accent-color animate-spin" />
                                                     )}
                                                 </div>
 
@@ -211,74 +213,83 @@ export default function BoardHeader({ board, currentUser, onToggleActivity }: Pr
                                                         <motion.div
                                                             initial={{ opacity: 0, y: -10 }}
                                                             animate={{ opacity: 1, y: 0 }}
-                                                            className="mt-2 p-2 bg-card border border-border rounded-2xl max-h-48 overflow-y-auto no-scrollbar shadow-lg"
+                                                            exit={{ opacity: 0, y: -10 }}
+                                                            className="p-3 bg-foreground border-4 border-foreground rounded-[2rem] space-y-2 max-h-56 overflow-y-auto no-scrollbar shadow-2xl"
                                                         >
                                                             {searchResults.map((user) => (
                                                                 <button
                                                                     key={user.id}
                                                                     onClick={() => handleAddMember(user.email)}
-                                                                    disabled={addingMember}
-                                                                    className="w-full flex items-center justify-between p-2 hover:bg-muted/20 rounded-xl transition-all text-left group"
+                                                                    className="w-full flex items-center justify-between p-4 hover:bg-accent-color group rounded-[1.5rem] transition-all bg-background border-2 border-transparent hover:border-foreground"
                                                                 >
-                                                                    <div className="flex items-center gap-3">
-                                                                        <div className="w-8 h-8 rounded-lg bg-accent-color/20 border border-accent-color/30 flex items-center justify-center text-[10px] font-bold text-accent-color group-hover:bg-accent-color group-hover:text-white transition-all">
+                                                                    <div className="flex items-center gap-4">
+                                                                        <div className="w-10 h-10 rounded-xl bg-muted/20 border-2 border-border flex items-center justify-center text-sm font-black text-foreground group-hover:bg-white group-hover:text-foreground">
                                                                             {user.name.charAt(0).toUpperCase()}
                                                                         </div>
-                                                                        <div className="flex flex-col">
-                                                                            <span className="text-xs font-bold text-foreground leading-none mb-1">{user.name}</span>
-                                                                            <span className="text-[10px] text-muted-foreground leading-none">{user.email}</span>
+                                                                        <div className="text-left">
+                                                                            <p className="text-sm font-black text-foreground group-hover:text-white leading-none mb-1">{user.name}</p>
+                                                                            <p className="text-[10px] text-muted-foreground group-hover:text-white/80 font-bold">{user.email}</p>
                                                                         </div>
                                                                     </div>
-                                                                    {processingEmail === user.email ? (
-                                                                        <div className="flex items-center gap-2 px-2 py-1 bg-accent-color/10 rounded-lg">
-                                                                            <span className="text-[10px] font-bold text-accent-color">Adding...</span>
-                                                                            <Loader2 className="w-3 h-3 text-accent-color animate-spin" />
-                                                                        </div>
-                                                                    ) : (
-                                                                        <UserPlus className="w-4 h-4 text-muted-foreground group-hover:text-accent-color opacity-0 group-hover:opacity-100 transition-all" />
-                                                                    )}
+                                                                    <UserPlus className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
                                                                 </button>
                                                             ))}
                                                         </motion.div>
                                                     )}
                                                 </AnimatePresence>
-                                                {memberError && (
-                                                    <p className="mt-2 text-[10px] font-bold text-rose-500 px-2">{memberError}</p>
-                                                )}
                                             </div>
                                         )}
 
-                                        <div className="space-y-1 max-h-64 overflow-y-auto no-scrollbar">
-                                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3 px-1">Current Team</p>
-                                            {board.members.map((m) => (
-                                                <div key={m.id} className="flex items-center justify-between p-2 hover:bg-muted/10 rounded-2xl group/member transition-colors">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="relative">
-                                                            <div className="w-10 h-10 bg-background border border-border rounded-xl flex items-center justify-center text-xs font-black text-foreground overflow-hidden">
-                                                                {m.user.avatar ? (
-                                                                    <img src={m.user.avatar} alt={m.user.name} className="w-full h-full object-cover" />
-                                                                ) : (
-                                                                    m.user.name.charAt(0).toUpperCase()
+                                        <div className="space-y-4">
+                                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] px-2">Active Members</p>
+                                            <div className="space-y-3 max-h-72 overflow-y-auto pr-3 no-scrollbar pb-4">
+                                                {board.members.map((m) => (
+                                                    <div
+                                                        key={m.id}
+                                                        className="flex items-center justify-between p-4 bg-background border-2 border-foreground/10 hover:border-foreground rounded-2xl hover:translate-x-1 hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all group"
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="relative">
+                                                                <div className="w-12 h-12 bg-muted/20 border-2 border-foreground/10 group-hover:border-foreground rounded-xl flex items-center justify-center overflow-hidden transition-colors">
+                                                                    {m.user.avatar ? (
+                                                                        <img src={m.user.avatar} alt={m.user.name} className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        <span className="text-xl font-black text-foreground">{m.user.name.charAt(0).toUpperCase()}</span>
+                                                                    )}
+                                                                </div>
+                                                                {m.userId === currentUser?.id && (
+                                                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-foreground rounded-full" />
                                                                 )}
                                                             </div>
-                                                            {m.user.id === currentUser.id && (
-                                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-background rounded-full" />
-                                                            )}
+                                                            <div>
+                                                                <p className="text-sm font-black text-foreground leading-none mb-1 flex items-center gap-2">
+                                                                    {m.user.name}
+                                                                    {m.userId === currentUser?.id && (
+                                                                        <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded border border-emerald-500/10 uppercase">You</span>
+                                                                    )}
+                                                                </p>
+                                                                <p className="text-[10px] text-muted-foreground font-medium tracking-tight opacity-60">{m.user.email}</p>
+                                                            </div>
                                                         </div>
-                                                        <div className="flex flex-col">
-                                                            <p className="text-sm font-bold text-foreground">
-                                                                {m.user.name}
-                                                                {m.user.id === currentUser.id && <span className="ml-1.5 text-[10px] text-muted-foreground font-medium">(You)</span>}
-                                                            </p>
-                                                            <p className="text-[10px] text-muted-foreground font-medium">{m.user.email}</p>
+                                                        <div className={`text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border-2 ${m.role === 'ADMIN' ? 'bg-accent-color/10 text-accent-color border-accent-color/20' : 'bg-muted/10 text-muted-foreground border-foreground/10'} `}>
+                                                            {m.role}
                                                         </div>
                                                     </div>
-                                                    <div className={`text - [9px] font - black uppercase tracking - widest px - 2 py - 1 rounded - lg ${m.role === 'ADMIN' ? 'bg-accent-color/10 text-accent-color border border-accent-color/20' : 'bg-muted/30 text-muted-foreground'} `}>
-                                                        {m.role}
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
+
+                                        {isAdmin && (
+                                            <button
+                                                onClick={() => {
+                                                    setShowMembers(false);
+                                                    onOpenTeamModal();
+                                                }}
+                                                className="w-full py-5 bg-foreground text-background text-xs font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-accent-color hover:text-white transition-all transform hover:-translate-y-1 active:translate-y-0 shadow-[8px_8px_0px_0px_rgba(var(--accent-rgb),0.2)]"
+                                            >
+                                                Manage Team
+                                            </button>
+                                        )}
                                     </div>
                                 </motion.div>
                             )}
@@ -329,6 +340,10 @@ export default function BoardHeader({ board, currentUser, onToggleActivity }: Pr
                                         Rename Board
                                     </button>
                                     <button
+                                        onClick={() => {
+                                            onOpenTeamModal();
+                                            setShowSettings(false);
+                                        }}
                                         className="w-full flex items-center gap-3 px-3 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted/20 rounded-xl transition-all text-xs font-medium group"
                                     >
                                         <div className="w-7 h-7 bg-muted/20 rounded-lg flex items-center justify-center group-hover:bg-accent-color/10 group-hover:text-accent-color">

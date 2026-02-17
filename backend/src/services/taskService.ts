@@ -27,7 +27,7 @@ export const taskService = {
 
         if (!list) throw new AppError('List not found', 404);
 
-        await boardService.verifyMembership(list.boardId, userId);
+        await boardService.verifyCanEdit(list.boardId, userId);
 
         // Get the next position
         const maxPosition = await prisma.task.aggregate({
@@ -68,7 +68,7 @@ export const taskService = {
 
         if (!task) throw new AppError('Task not found', 404);
 
-        await boardService.verifyMembership(task.list.boardId, userId);
+        await boardService.verifyCanEdit(task.list.boardId, userId);
 
         const updated = await prisma.task.update({
             where: { id: taskId },
@@ -103,7 +103,7 @@ export const taskService = {
         if (!task) throw new AppError('Task not found', 404);
 
         const boardId = task.list.boardId;
-        await boardService.verifyMembership(boardId, userId);
+        await boardService.verifyCanEdit(boardId, userId);
 
         // Verify destination list belongs to same board
         const destList = await prisma.list.findUnique({
@@ -207,7 +207,7 @@ export const taskService = {
 
         if (!task) throw new AppError('Task not found', 404);
 
-        await boardService.verifyMembership(task.list.boardId, userId);
+        await boardService.verifyCanEdit(task.list.boardId, userId);
 
         await prisma.$transaction(async (tx) => {
             await tx.task.delete({ where: { id: taskId } });
@@ -243,7 +243,7 @@ export const taskService = {
         if (!task) throw new AppError('Task not found', 404);
 
         const boardId = task.list.boardId;
-        await boardService.verifyMembership(boardId, userId);
+        await boardService.verifyCanEdit(boardId, userId);
 
         // Verify the user to assign is a board member
         await boardService.verifyMembership(boardId, assignUserId);
@@ -291,7 +291,7 @@ export const taskService = {
         if (!task) throw new AppError('Task not found', 404);
 
         const boardId = task.list.boardId;
-        await boardService.verifyMembership(boardId, userId);
+        await boardService.verifyCanEdit(boardId, userId);
 
         const assignee = await prisma.taskAssignee.findUnique({
             where: { taskId_userId: { taskId, userId: removeUserId } },

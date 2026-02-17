@@ -314,6 +314,49 @@ export const boardService = {
         return { message: 'Member removed successfully' };
     },
 
+    async updateMemberRole(boardId: string, memberUserId: string, role: string, userId: string) {
+        await this.verifyAdmin(boardId, userId);
+
+        if (memberUserId === userId) {
+            throw new AppError('Cannot change your own role', 400);
+        }
+
+        const member = await prisma.boardMember.findUnique({
+            where: { boardId_userId: { boardId, userId: memberUserId } },
+            include: { user: { select: { name: true } } }
+        });
+
+        if (!member) {
+            throw new AppError('Member not found', 404);
+        }
+
+        const validRoles = ['ADMIN', 'EDITOR', 'VIEWER', 'MEMBER'];
+        if (!validRoles.includes(role)) {
+            throw new AppError('Invalid role', 400);
+        }
+
+        const updated = await prisma.boardMember.update({
+            where: { id: member.id },
+            data: { role: role as any },
+            include: {
+                user: {
+                    select: { id: true, name: true, email: true, avatar: true },
+                },
+            },
+        });
+
+        await activityService.log({
+            action: 'BOARD_UPDATED', // We can optionally add a generic action or a specific one
+            entityType: 'BoardMember',
+            entityId: member.id,
+            metadata: { memberName: updated.user.name, newRole: role },
+            userId,
+            boardId,
+        });
+
+        return updated;
+    },
+
     async verifyMembership(boardId: string, userId: string) {
         const membership = await prisma.boardMember.findUnique({
             where: { boardId_userId: { boardId, userId } },
@@ -327,16 +370,20 @@ export const boardService = {
     },
 
     async verifyAdmin(boardId: string, userId: string) {
-        const membership = await prisma.boardMember.findUnique({
-            where: { boardId_userId: { boardId, userId } },
-        });
-
-        if (!membership) {
-            throw new AppError('Access denied', 403);
-        }
+        const membership = await this.verifyMembership(boardId, userId);
 
         if (membership.role !== 'ADMIN') {
             throw new AppError('Admin access required', 403);
+        }
+
+        return membership;
+    },
+
+    async verifyCanEdit(boardId: string, userId: string) {
+        const membership = await this.verifyMembership(boardId, userId);
+
+        if (membership.role === 'VIEWER') {
+            throw new AppError('Viewer access is read-only', 403);
         }
 
         return membership;

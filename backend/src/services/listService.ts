@@ -6,8 +6,8 @@ import { CreateListInput, UpdateListInput } from '../types';
 
 export const listService = {
     async create(input: CreateListInput, userId: string) {
-        // Verify board membership
-        await boardService.verifyMembership(input.boardId, userId);
+        // Verify board membership and edit permissions
+        await boardService.verifyCanEdit(input.boardId, userId);
 
         // Get the next position
         const maxPosition = await prisma.list.aggregate({
@@ -55,7 +55,7 @@ export const listService = {
         const list = await prisma.list.findUnique({ where: { id: listId } });
         if (!list) throw new AppError('List not found', 404);
 
-        await boardService.verifyMembership(list.boardId, userId);
+        await boardService.verifyCanEdit(list.boardId, userId);
 
         // Handle position update
         if (input.position !== undefined && input.position !== list.position) {
@@ -100,7 +100,7 @@ export const listService = {
         const list = await prisma.list.findUnique({ where: { id: listId } });
         if (!list) throw new AppError('List not found', 404);
 
-        await boardService.verifyMembership(list.boardId, userId);
+        await boardService.verifyCanEdit(list.boardId, userId);
 
         await prisma.$transaction(async (tx) => {
             await tx.list.delete({ where: { id: listId } });

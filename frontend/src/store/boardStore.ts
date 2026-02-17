@@ -27,6 +27,8 @@ interface BoardState {
     // Task CRUD
     createTask: (title: string, listId: string, description?: string) => Promise<void>;
     updateTask: (id: string, data: { title?: string; description?: string; dueDate?: string | null }) => Promise<void>;
+    removeMember: (boardId: string, userId: string) => Promise<void>;
+    updateMemberRole: (boardId: string, userId: string, role: string) => Promise<void>;
     moveTask: (taskId: string, toListId: string, newPosition: number) => Promise<void>;
     deleteTask: (id: string) => Promise<void>;
     assignTask: (taskId: string, userId: string) => Promise<void>;
@@ -231,6 +233,42 @@ export const useBoardStore = create<BoardState>((set, get) => ({
         } catch (error: any) {
             set({ error: error.response?.data?.error || 'Failed to update task' });
             throw error;
+        }
+    },
+
+    removeMember: async (boardId: string, userId: string) => {
+        try {
+            await boardsApi.removeMember(boardId, userId);
+            set((state) => {
+                if (!state.currentBoard) return state;
+                return {
+                    currentBoard: {
+                        ...state.currentBoard,
+                        members: state.currentBoard.members.filter((m) => m.userId !== userId),
+                    },
+                };
+            });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to remove member' });
+        }
+    },
+
+    updateMemberRole: async (boardId: string, userId: string, role: string) => {
+        try {
+            const member = await boardsApi.updateMemberRole(boardId, userId, role);
+            set((state) => {
+                if (!state.currentBoard) return state;
+                return {
+                    currentBoard: {
+                        ...state.currentBoard,
+                        members: state.currentBoard.members.map((m) =>
+                            m.userId === userId ? member.data.data : m
+                        ),
+                    },
+                };
+            });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to update member role' });
         }
     },
 

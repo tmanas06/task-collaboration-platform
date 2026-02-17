@@ -1,26 +1,29 @@
 import { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import type { List, BoardMember } from '../../types';
+import type { List, BoardMember, Task, User } from '../../types';
 import TaskCard from '../task/TaskCard';
 import TaskModal from '../task/TaskModal';
 import CreateTaskButton from '../task/CreateTaskButton';
 import { useBoardStore } from '../../store/boardStore';
-import type { Task } from '../../types';
 import { MoreVertical, Trash2, Edit3, GripVertical, List as ListIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
     list: List;
     boardMembers: BoardMember[];
+    currentUser: User | null;
 }
 
-export default function ListColumn({ list, boardMembers }: Props) {
+export default function ListColumn({ list, boardMembers, currentUser }: Props) {
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [title, setTitle] = useState(list.title);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const { updateList, deleteList } = useBoardStore();
     const [showMenu, setShowMenu] = useState(false);
+
+    const userRole = boardMembers.find(m => m.userId === currentUser?.id)?.role;
+    const canEdit = userRole !== 'VIEWER';
 
     const { setNodeRef, isOver } = useDroppable({
         id: `list-${list.id}`,
@@ -66,8 +69,8 @@ export default function ListColumn({ list, boardMembers }: Props) {
                         ) : (
                             <div className="flex items-center gap-2 overflow-hidden">
                                 <h3
-                                    className="text-sm font-black text-foreground cursor-pointer hover:text-accent-color transition-colors uppercase tracking-widest truncate"
-                                    onClick={() => setIsEditingTitle(true)}
+                                    className={`text - sm font - black text - foreground ${canEdit ? 'cursor-pointer hover:text-accent-color' : ''} transition-colors uppercase tracking-widest truncate`}
+                                    onClick={() => canEdit && setIsEditingTitle(true)}
                                 >
                                     {list.title}
                                 </h3>
@@ -79,42 +82,44 @@ export default function ListColumn({ list, boardMembers }: Props) {
                     </div>
 
                     {/* Menu */}
-                    <div className="relative">
-                        <button
-                            onClick={() => setShowMenu(!showMenu)}
-                            className={`p-2 rounded-xl transition-all ${showMenu ? 'bg-muted/20 text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/10'}`}
-                        >
-                            <MoreVertical className="w-4 h-4" />
-                        </button>
+                    {canEdit && (
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowMenu(!showMenu)}
+                                className={`p - 2 rounded - xl transition - all ${showMenu ? 'bg-muted/20 text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/10'} `}
+                            >
+                                <MoreVertical className="w-4 h-4" />
+                            </button>
 
-                        <AnimatePresence>
-                            {showMenu && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                    className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-2xl shadow-2xl z-50 overflow-hidden shadow-lg"
-                                >
-                                    <div className="p-2 space-y-1">
-                                        <button
-                                            onClick={() => { setIsEditingTitle(true); setShowMenu(false); }}
-                                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/10 rounded-xl transition-all"
-                                        >
-                                            <Edit3 className="w-3.5 h-3.5" />
-                                            Rename List
-                                        </button>
-                                        <button
-                                            onClick={handleDelete}
-                                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                            Remove List
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
+                            <AnimatePresence>
+                                {showMenu && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                        className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-2xl shadow-2xl z-50 overflow-hidden shadow-lg"
+                                    >
+                                        <div className="p-2 space-y-1">
+                                            <button
+                                                onClick={() => { setIsEditingTitle(true); setShowMenu(false); }}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/10 rounded-xl transition-all"
+                                            >
+                                                <Edit3 className="w-3.5 h-3.5" />
+                                                Rename List
+                                            </button>
+                                            <button
+                                                onClick={handleDelete}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                                Remove List
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    )}
                 </div>
 
                 {/* Tasks - Independent Scroll Utility */}
@@ -150,9 +155,11 @@ export default function ListColumn({ list, boardMembers }: Props) {
                 </div>
 
                 {/* Footer / Add Task */}
-                <div className="p-4 bg-muted/5">
-                    <CreateTaskButton listId={list.id} />
-                </div>
+                {canEdit && (
+                    <div className="p-4 bg-muted/5">
+                        <CreateTaskButton listId={list.id} />
+                    </div>
+                )}
             </div>
 
             {/* Task modal with Side Panel feel potentially or just updated theme */}

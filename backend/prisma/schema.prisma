@@ -121,6 +121,8 @@ model Activity {
 
 enum Role {
   ADMIN
+  EDITOR
+  VIEWER
   MEMBER
 }
 
