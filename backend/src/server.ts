@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+// restart-trigger
 import { setupSocketHandlers, emitBoardEvent } from './socket/handlers';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
